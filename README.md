@@ -1,7 +1,9 @@
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/Sun-is-still-high/backend-project-6/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/Sun-is-still-high/backend-project-6/actions)
 
-## TODO Ссылка на рендер
+## Render
+
+https://backend-project-6-otrg.onrender.com/
 
 ## Setup
 
