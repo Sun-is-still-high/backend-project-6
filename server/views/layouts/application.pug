@@ -1,0 +1,29 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    title= t('appName')
+    link(rel="stylesheet" href="/assets/styles.css")
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      .container
+        a.navbar-brand(href="/")= t('layouts.navbar.brand')
+        button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav")
+          span.navbar-toggler-icon
+        #navbarNav.collapse.navbar-collapse
+          ul.navbar-nav.me-auto
+            li.nav-item
+              a.nav-link(href="/")= t('layouts.navbar.home')
+            li.nav-item
+              a.nav-link(href="/users")= t('layouts.navbar.users')
+          ul.navbar-nav
+            li.nav-item
+              a.nav-link(href="/session/new")= t('layouts.navbar.signIn')
+            li.nav-item
+              a.nav-link(href="/users/new")= t('layouts.navbar.signUp')
+
+    main.container.mt-4
+      block content
+
+    script(src="/assets/main.js")
