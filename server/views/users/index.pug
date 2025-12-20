@@ -1,0 +1,24 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.users.index.title')
+
+  table.table
+    thead
+      tr
+        th= t('views.users.id')
+        th= t('views.users.fullName')
+        th= t('views.users.email')
+        th= t('views.users.createdAt')
+        if currentUser
+          th= t('views.users.actions')
+    tbody
+      each user in users
+        tr
+          td= user.id
+          td= user.fullName
+          td= user.email
+          td= new Date(user.createdAt).toLocaleString()
+          if currentUser && currentUser.id === user.id
+            td
+              a.btn.btn-primary.btn-sm(href=`/users/${user.id}/edit`)= t('views.users.edit.title')

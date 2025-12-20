@@ -1,5 +1,5 @@
 doctype html
-html(lang="en")
+html(lang="ru")
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
@@ -18,12 +18,27 @@ html(lang="en")
             li.nav-item
               a.nav-link(href="/users")= t('layouts.navbar.users')
           ul.navbar-nav
-            li.nav-item
-              a.nav-link(href="/session/new")= t('layouts.navbar.signIn')
-            li.nav-item
-              a.nav-link(href="/users/new")= t('layouts.navbar.signUp')
+            if currentUser
+              li.nav-item
+                a.nav-link(href=`/users/${currentUser.id}/edit`)= currentUser.fullName
+              li.nav-item
+                form.d-inline(method="post" action="/session?_method=DELETE")
+                  button.btn.nav-link(type="submit")= t('layouts.navbar.signOut')
+            else
+              li.nav-item
+                a.nav-link(href="/session/new")= t('layouts.navbar.signIn')
+              li.nav-item
+                a.nav-link(href="/users/new")= t('layouts.navbar.signUp')
 
     main.container.mt-4
+      if flash.info
+        .alert.alert-info.alert-dismissible.fade.show(role="alert")
+          = flash.info
+          button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
+      if flash.error
+        .alert.alert-danger.alert-dismissible.fade.show(role="alert")
+          = flash.error
+          button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
       block content
 
     script(src="/assets/main.js")

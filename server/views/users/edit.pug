@@ -1,0 +1,58 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.users.edit.title')
+
+  form(method="post" action=`/users/${user.id}?_method=PATCH`)
+    .mb-3
+      label.form-label(for="data_firstName")= t('views.users.firstName')
+      input#data_firstName.form-control(
+        type="text"
+        name="data[firstName]"
+        value=user.firstName || ''
+        required
+        class=errors.firstName ? 'is-invalid' : ''
+      )
+      if errors.firstName
+        .invalid-feedback= errors.firstName[0].message
+
+    .mb-3
+      label.form-label(for="data_lastName")= t('views.users.lastName')
+      input#data_lastName.form-control(
+        type="text"
+        name="data[lastName]"
+        value=user.lastName || ''
+        required
+        class=errors.lastName ? 'is-invalid' : ''
+      )
+      if errors.lastName
+        .invalid-feedback= errors.lastName[0].message
+
+    .mb-3
+      label.form-label(for="data_email")= t('views.users.email')
+      input#data_email.form-control(
+        type="email"
+        name="data[email]"
+        value=user.email || ''
+        required
+        class=errors.email ? 'is-invalid' : ''
+      )
+      if errors.email
+        .invalid-feedback= errors.email[0].message
+
+    .mb-3
+      label.form-label(for="data_password")= t('views.users.password')
+      input#data_password.form-control(
+        type="password"
+        name="data[password]"
+        class=errors.password ? 'is-invalid' : ''
+      )
+      if errors.password
+        .invalid-feedback= errors.password[0].message
+
+    button.btn.btn-primary.me-2(type="submit")= t('views.users.edit.submit')
+
+  hr
+
+  form.mt-3(method="post" action=`/users/${user.id}?_method=DELETE`)
+    button.btn.btn-danger(type="submit")= t('views.users.edit.delete')

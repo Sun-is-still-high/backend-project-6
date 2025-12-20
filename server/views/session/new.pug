@@ -1,0 +1,27 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.session.new.title')
+
+  form(method="post" action="/session")
+    .mb-3
+      label.form-label(for="data_email")= t('views.users.email')
+      input#data_email.form-control(
+        type="email"
+        name="data[email]"
+        value=email || ''
+        required
+        class=errors.email ? 'is-invalid' : ''
+      )
+      if errors.email
+        .invalid-feedback= errors.email[0].message
+
+    .mb-3
+      label.form-label(for="data_password")= t('views.users.password')
+      input#data_password.form-control(
+        type="password"
+        name="data[password]"
+        required
+      )
+
+    button.btn.btn-primary(type="submit")= t('views.session.new.submit')
