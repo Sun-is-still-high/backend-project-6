@@ -1,0 +1,24 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.statuses.edit.title')
+
+  form(method="post" action=`/statuses/${status.id}?_method=PATCH`)
+    .mb-3
+      label.form-label(for="data_name")= t('views.statuses.name')
+      input#data_name.form-control(
+        type="text"
+        name="data[name]"
+        value=status.name || ''
+        required
+        class=errors.name ? 'is-invalid' : ''
+      )
+      if errors.name
+        .invalid-feedback= errors.name[0].message
+
+    button.btn.btn-primary.me-2(type="submit")= t('views.statuses.edit.submit')
+
+  hr
+
+  form.mt-3(method="post" action=`/statuses/${status.id}?_method=DELETE`)
+    button.btn.btn-danger(type="submit")= t('views.statuses.edit.delete')

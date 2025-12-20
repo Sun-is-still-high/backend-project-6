@@ -1,0 +1,19 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.statuses.new.title')
+
+  form(method="post" action="/statuses")
+    .mb-3
+      label.form-label(for="data_name")= t('views.statuses.name')
+      input#data_name.form-control(
+        type="text"
+        name="data[name]"
+        value=status.name || ''
+        required
+        class=errors.name ? 'is-invalid' : ''
+      )
+      if errors.name
+        .invalid-feedback= errors.name[0].message
+
+    button.btn.btn-primary(type="submit")= t('views.statuses.new.submit')

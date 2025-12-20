@@ -6,6 +6,7 @@ export default {
         brand: 'Fastify Блог',
         home: 'Главная',
         users: 'Пользователи',
+        statuses: 'Статусы',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -44,6 +45,30 @@ export default {
           submit: 'Войти',
         },
       },
+      statuses: {
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        errors: {
+          nameRequired: 'Наименование обязательно для заполнения',
+        },
+        index: {
+          title: 'Статусы',
+          createLink: 'Создать статус',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
+        new: {
+          title: 'Создание статуса',
+          submit: 'Создать',
+        },
+        edit: {
+          title: 'Изменение статуса',
+          submit: 'Изменить',
+          delete: 'Удалить',
+        },
+      },
     },
     flash: {
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -70,6 +95,21 @@ export default {
         },
         delete: {
           success: 'Вы разлогинены',
+        },
+      },
+      statuses: {
+        create: {
+          success: 'Статус успешно создан',
+          error: 'Не удалось создать статус',
+        },
+        edit: {
+          success: 'Статус успешно изменён',
+          error: 'Не удалось изменить статус',
+          notFound: 'Статус не найден',
+        },
+        delete: {
+          success: 'Статус успешно удалён',
+          notFound: 'Статус не найден',
         },
       },
     },

@@ -1,0 +1,24 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.statuses.index.title')
+
+  a.btn.btn-primary.mb-3(href="/statuses/new")= t('views.statuses.index.createLink')
+
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.statuses.id')
+        th= t('views.statuses.name')
+        th= t('views.statuses.createdAt')
+        th= t('views.statuses.actions')
+    tbody
+      each status in statuses
+        tr
+          td= status.id
+          td= status.name
+          td= status.createdAt
+          td
+            a.btn.btn-sm.btn-warning(href=`/statuses/${status.id}/edit`)= t('views.statuses.index.edit')
+            form.d-inline.ms-2(method="post" action=`/statuses/${status.id}?_method=DELETE`)
+              button.btn.btn-sm.btn-danger(type="submit")= t('views.statuses.index.delete')
