@@ -2,11 +2,12 @@ import i18next from 'i18next';
 import Task from '../models/Task.js';
 import TaskStatus from '../models/TaskStatus.js';
 import User from '../models/User.js';
+import Label from '../models/Label.js';
 
 export default (app) => {
   app.get('/tasks', async (request, reply) => {
     const tasks = await Task.query()
-      .withGraphFetched('[status, creator, executor]');
+      .withGraphFetched('[status, creator, executor, labels]');
     return reply.render('tasks/index.pug', { tasks });
   });
 
@@ -21,7 +22,8 @@ export default (app) => {
     const task = new Task();
     const statuses = await TaskStatus.query();
     const users = await User.query();
-    return reply.render('tasks/new.pug', { task, statuses, users, errors: {} });
+    const labels = await Label.query();
+    return reply.render('tasks/new.pug', { task, statuses, users, labels, errors: {} });
   });
 
   app.post('/tasks', async (request, reply) => {
@@ -46,10 +48,12 @@ export default (app) => {
       request.flash('error', i18next.t('flash.tasks.create.error'));
       const statuses = await TaskStatus.query();
       const users = await User.query();
+      const labels = await Label.query();
       return reply.code(422).render('tasks/new.pug', {
-        task: data,
+        task: { ...data, labelIds: data.labels },
         statuses,
         users,
+        labels,
         errors,
       });
     }
@@ -62,18 +66,34 @@ export default (app) => {
       executorId: data.executorId ? Number(data.executorId) : null,
     };
 
+    const labelIds = data.labels
+      ? (Array.isArray(data.labels) ? data.labels : [data.labels]).map(Number)
+      : [];
+
     try {
-      await Task.query().insert(taskData);
+      const knex = Task.knex();
+      const newTask = await Task.query().insert(taskData);
+
+      if (labelIds.length > 0) {
+        const labelRows = labelIds.map((labelId) => ({
+          task_id: newTask.id,
+          label_id: labelId,
+        }));
+        await knex('tasks_labels').insert(labelRows);
+      }
+
       request.flash('info', i18next.t('flash.tasks.create.success'));
       return reply.redirect('/tasks');
     } catch (error) {
       request.flash('error', i18next.t('flash.tasks.create.error'));
       const statuses = await TaskStatus.query();
       const users = await User.query();
+      const labels = await Label.query();
       return reply.code(422).render('tasks/new.pug', {
-        task: data,
+        task: { ...data, labelIds: data.labels },
         statuses,
         users,
+        labels,
         errors: error.data || {},
       });
     }
@@ -84,7 +104,7 @@ export default (app) => {
 
     const task = await Task.query()
       .findById(id)
-      .withGraphFetched('[status, creator, executor]');
+      .withGraphFetched('[status, creator, executor, labels]');
 
     if (!task) {
       request.flash('error', i18next.t('flash.tasks.show.notFound'));
@@ -103,7 +123,9 @@ export default (app) => {
       return reply.redirect('/session/new');
     }
 
-    const task = await Task.query().findById(id);
+    const task = await Task.query()
+      .findById(id)
+      .withGraphFetched('labels');
     if (!task) {
       request.flash('error', i18next.t('flash.tasks.edit.notFound'));
       return reply.redirect('/tasks');
@@ -111,7 +133,8 @@ export default (app) => {
 
     const statuses = await TaskStatus.query();
     const users = await User.query();
-    return reply.render('tasks/edit.pug', { task, statuses, users, errors: {} });
+    const labels = await Label.query();
+    return reply.render('tasks/edit.pug', { task, statuses, users, labels, errors: {} });
   });
 
   app.patch('/tasks/:id', async (request, reply) => {
@@ -143,10 +166,12 @@ export default (app) => {
       request.flash('error', i18next.t('flash.tasks.edit.error'));
       const statuses = await TaskStatus.query();
       const users = await User.query();
+      const labels = await Label.query();
       return reply.code(422).render('tasks/edit.pug', {
-        task: { ...task, ...data },
+        task: { ...task, ...data, labelIds: data.labels },
         statuses,
         users,
+        labels,
         errors,
       });
     }
@@ -158,18 +183,36 @@ export default (app) => {
       executorId: data.executorId ? Number(data.executorId) : null,
     };
 
+    const labelIds = data.labels
+      ? (Array.isArray(data.labels) ? data.labels : [data.labels]).map(Number)
+      : [];
+
     try {
+      const knex = Task.knex();
       await task.$query().patch(taskData);
+
+      // Update labels: delete old and insert new
+      await knex('tasks_labels').where('task_id', id).delete();
+      if (labelIds.length > 0) {
+        const labelRows = labelIds.map((labelId) => ({
+          task_id: Number(id),
+          label_id: labelId,
+        }));
+        await knex('tasks_labels').insert(labelRows);
+      }
+
       request.flash('info', i18next.t('flash.tasks.edit.success'));
       return reply.redirect('/tasks');
     } catch (error) {
       request.flash('error', i18next.t('flash.tasks.edit.error'));
       const statuses = await TaskStatus.query();
       const users = await User.query();
+      const labels = await Label.query();
       return reply.code(422).render('tasks/edit.pug', {
-        task: { ...task, ...data },
+        task: { ...task, ...data, labelIds: data.labels },
         statuses,
         users,
+        labels,
         errors: error.data || {},
       });
     }

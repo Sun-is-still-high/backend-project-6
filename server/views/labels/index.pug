@@ -1,0 +1,24 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.labels.index.title')
+
+  a.btn.btn-primary.mb-3(href="/labels/new")= t('views.labels.index.createLink')
+
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.labels.id')
+        th= t('views.labels.name')
+        th= t('views.labels.createdAt')
+        th= t('views.labels.actions')
+    tbody
+      each label in labels
+        tr
+          td= label.id
+          td= label.name
+          td= label.createdAt
+          td
+            a.btn.btn-sm.btn-warning.me-1(href=`/labels/${label.id}/edit`)= t('views.labels.index.edit')
+            form.d-inline(method="post" action=`/labels/${label.id}?_method=DELETE`)
+              button.btn.btn-sm.btn-danger(type="submit")= t('views.labels.index.delete')

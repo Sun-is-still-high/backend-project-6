@@ -21,6 +21,14 @@ block content
         th= t('views.tasks.executor')
         td= task.executor ? task.executor.fullName : ''
       tr
+        th= t('views.tasks.labels')
+        td
+          if task.labels && task.labels.length
+            each label in task.labels
+              span.badge.bg-secondary.me-1= label.name
+          else
+            | -
+      tr
         th= t('views.tasks.createdAt')
         td= task.createdAt
 

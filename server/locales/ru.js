@@ -8,6 +8,7 @@ export default {
         users: 'Пользователи',
         statuses: 'Статусы',
         tasks: 'Задачи',
+        labels: 'Метки',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -104,6 +105,31 @@ export default {
           submit: 'Изменить',
           delete: 'Удалить',
         },
+        labels: 'Метки',
+      },
+      labels: {
+        id: 'ID',
+        name: 'Наименование',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        errors: {
+          nameRequired: 'Наименование обязательно для заполнения',
+        },
+        index: {
+          title: 'Метки',
+          createLink: 'Создать метку',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
+        new: {
+          title: 'Создание метки',
+          submit: 'Создать',
+        },
+        edit: {
+          title: 'Изменение метки',
+          submit: 'Изменить',
+          delete: 'Удалить',
+        },
       },
     },
     flash: {
@@ -167,6 +193,22 @@ export default {
           success: 'Задача успешно удалена',
           notFound: 'Задача не найдена',
           accessError: 'Задачу может удалить только её автор',
+        },
+      },
+      labels: {
+        create: {
+          success: 'Метка успешно создана',
+          error: 'Не удалось создать метку',
+        },
+        edit: {
+          success: 'Метка успешно изменена',
+          error: 'Не удалось изменить метку',
+          notFound: 'Метка не найдена',
+        },
+        delete: {
+          success: 'Метка успешно удалена',
+          notFound: 'Метка не найдена',
+          hasTasks: 'Нельзя удалить метку, связанную с задачей',
         },
       },
     },

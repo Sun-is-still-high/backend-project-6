@@ -51,4 +51,16 @@ block content
       if errors.executorId
         .invalid-feedback= errors.executorId[0].message
 
+    .mb-3
+      label.form-label(for="data_labels")= t('views.tasks.labels')
+      select#data_labels.form-select(
+        name="data[labels]"
+        multiple
+        size="3"
+      )
+        each label in labels
+          - const selectedLabels = task.labels || []
+          - const isSelected = selectedLabels.some(l => l.id == label.id) || (Array.isArray(task.labelIds) && task.labelIds.includes(String(label.id)))
+          option(value=label.id selected=isSelected)= label.name
+
     button.btn.btn-primary(type="submit")= t('views.tasks.new.submit')
