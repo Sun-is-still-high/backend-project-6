@@ -41,7 +41,9 @@ describe('Tasks CRUD', () => {
   });
 
   beforeEach(async () => {
+    await knex('tasks_labels').truncate();
     await knex('tasks').truncate();
+    await knex('labels').truncate();
     await knex('task_statuses').truncate();
     await knex('users').truncate();
   });
@@ -451,6 +453,171 @@ describe('Tasks CRUD', () => {
 
       const statuses = await knex('task_statuses').select();
       expect(statuses).toHaveLength(1);
+    });
+  });
+
+  describe('Task filtering', () => {
+    it('should filter tasks by status', async () => {
+      const userId = await createUser();
+      const status1Id = await createStatus('Новый');
+      const status2Id = await createStatus('В работе');
+
+      await knex('tasks').insert({
+        name: 'Задача 1',
+        status_id: status1Id,
+        creator_id: userId,
+      });
+      await knex('tasks').insert({
+        name: 'Задача 2',
+        status_id: status2Id,
+        creator_id: userId,
+      });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/tasks?status=${status1Id}`,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('Задача 1');
+      expect(response.body).not.toContain('Задача 2');
+    });
+
+    it('should filter tasks by executor', async () => {
+      const creatorId = await createUser('creator@example.com');
+      const executor1Id = await createUser('executor1@example.com');
+      const executor2Id = await createUser('executor2@example.com');
+      const statusId = await createStatus();
+
+      await knex('tasks').insert({
+        name: 'Задача исполнителя 1',
+        status_id: statusId,
+        creator_id: creatorId,
+        executor_id: executor1Id,
+      });
+      await knex('tasks').insert({
+        name: 'Задача исполнителя 2',
+        status_id: statusId,
+        creator_id: creatorId,
+        executor_id: executor2Id,
+      });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/tasks?executor=${executor1Id}`,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('Задача исполнителя 1');
+      expect(response.body).not.toContain('Задача исполнителя 2');
+    });
+
+    it('should filter tasks by label', async () => {
+      const userId = await createUser();
+      const statusId = await createStatus();
+
+      const [label1Id] = await knex('labels').insert({ name: 'Важное' });
+      const [label2Id] = await knex('labels').insert({ name: 'Срочное' });
+
+      const [task1Id] = await knex('tasks').insert({
+        name: 'Задача с меткой 1',
+        status_id: statusId,
+        creator_id: userId,
+      });
+      const [task2Id] = await knex('tasks').insert({
+        name: 'Задача с меткой 2',
+        status_id: statusId,
+        creator_id: userId,
+      });
+
+      await knex('tasks_labels').insert({ task_id: task1Id, label_id: label1Id });
+      await knex('tasks_labels').insert({ task_id: task2Id, label_id: label2Id });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/tasks?label=${label1Id}`,
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('Задача с меткой 1');
+      expect(response.body).not.toContain('Задача с меткой 2');
+    });
+
+    it('should filter tasks by creator (isCreatorUser)', async () => {
+      const user1Id = await createUser('user1@example.com');
+      const user2Id = await createUser('user2@example.com');
+      const statusId = await createStatus();
+      const cookies = await signIn('user1@example.com');
+
+      await knex('tasks').insert({
+        name: 'Задача пользователя 1',
+        status_id: statusId,
+        creator_id: user1Id,
+      });
+      await knex('tasks').insert({
+        name: 'Задача пользователя 2',
+        status_id: statusId,
+        creator_id: user2Id,
+      });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/tasks?isCreatorUser=1',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('Задача пользователя 1');
+      expect(response.body).not.toContain('Задача пользователя 2');
+    });
+
+    it('should filter tasks by multiple criteria', async () => {
+      const user1Id = await createUser('user1@example.com');
+      const user2Id = await createUser('user2@example.com');
+      const status1Id = await createStatus('Новый');
+      const status2Id = await createStatus('В работе');
+      const cookies = await signIn('user1@example.com');
+
+      await knex('tasks').insert({
+        name: 'Задача 1 - Новый статус, пользователь 1',
+        status_id: status1Id,
+        creator_id: user1Id,
+      });
+      await knex('tasks').insert({
+        name: 'Задача 2 - В работе, пользователь 1',
+        status_id: status2Id,
+        creator_id: user1Id,
+      });
+      await knex('tasks').insert({
+        name: 'Задача 3 - Новый статус, пользователь 2',
+        status_id: status1Id,
+        creator_id: user2Id,
+      });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/tasks?status=${status1Id}&isCreatorUser=1`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('Задача 1 - Новый статус, пользователь 1');
+      expect(response.body).not.toContain('Задача 2 - В работе, пользователь 1');
+      expect(response.body).not.toContain('Задача 3 - Новый статус, пользователь 2');
+    });
+
+    it('should show filter form with correct elements', async () => {
+      const response = await server.inject({
+        method: 'GET',
+        url: '/tasks',
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toContain('name="status"');
+      expect(response.body).toContain('name="executor"');
+      expect(response.body).toContain('name="label"');
+      expect(response.body).toContain('name="isCreatorUser"');
+      expect(response.body).toContain('Показать');
     });
   });
 });

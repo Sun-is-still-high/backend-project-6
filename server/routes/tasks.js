@@ -6,9 +6,42 @@ import Label from '../models/Label.js';
 
 export default (app) => {
   app.get('/tasks', async (request, reply) => {
-    const tasks = await Task.query()
-      .withGraphFetched('[status, creator, executor, labels]');
-    return reply.render('tasks/index.pug', { tasks });
+    const { status, executor, label, isCreatorUser } = request.query;
+    const currentUser = request.currentUser;
+
+    let query = Task.query().withGraphFetched('[status, creator, executor, labels]');
+
+    if (status) {
+      query = query.where('status_id', status);
+    }
+
+    if (executor) {
+      query = query.where('executor_id', executor);
+    }
+
+    if (label) {
+      query = query.whereExists(
+        Task.relatedQuery('labels').where('labels.id', label),
+      );
+    }
+
+    if (isCreatorUser && currentUser) {
+      query = query.where('creator_id', currentUser.id);
+    }
+
+    const tasks = await query;
+    const statuses = await TaskStatus.query();
+    const users = await User.query();
+    const labels = await Label.query();
+
+    const filter = {
+      status: status ? Number(status) : null,
+      executor: executor ? Number(executor) : null,
+      label: label ? Number(label) : null,
+      isCreatorUser: !!isCreatorUser,
+    };
+
+    return reply.render('tasks/index.pug', { tasks, statuses, users, labels, filter });
   });
 
   app.get('/tasks/new', async (request, reply) => {

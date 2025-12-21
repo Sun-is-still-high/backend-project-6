@@ -92,6 +92,16 @@ export default {
           edit: 'Изменить',
           delete: 'Удалить',
         },
+        filter: {
+          status: 'Статус',
+          executor: 'Исполнитель',
+          label: 'Метка',
+          isCreatorUser: 'Только мои задачи',
+          selectStatus: '',
+          selectExecutor: '',
+          selectLabel: '',
+          submit: 'Показать',
+        },
         new: {
           title: 'Создание задачи',
           submit: 'Создать',
