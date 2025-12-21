@@ -7,6 +7,7 @@ export default {
         home: 'Главная',
         users: 'Пользователи',
         statuses: 'Статусы',
+        tasks: 'Задачи',
         signIn: 'Вход',
         signUp: 'Регистрация',
         signOut: 'Выход',
@@ -69,6 +70,41 @@ export default {
           delete: 'Удалить',
         },
       },
+      tasks: {
+        id: 'ID',
+        name: 'Наименование',
+        description: 'Описание',
+        status: 'Статус',
+        creator: 'Автор',
+        executor: 'Исполнитель',
+        createdAt: 'Дата создания',
+        actions: 'Действия',
+        selectStatus: '',
+        selectExecutor: '',
+        errors: {
+          nameRequired: 'Наименование обязательно для заполнения',
+          statusRequired: 'Статус обязателен для выбора',
+        },
+        index: {
+          title: 'Задачи',
+          createLink: 'Создать задачу',
+          edit: 'Изменить',
+          delete: 'Удалить',
+        },
+        new: {
+          title: 'Создание задачи',
+          submit: 'Создать',
+        },
+        show: {
+          edit: 'Изменить',
+          back: 'Назад',
+        },
+        edit: {
+          title: 'Изменение задачи',
+          submit: 'Изменить',
+          delete: 'Удалить',
+        },
+      },
     },
     flash: {
       authError: 'Доступ запрещён! Пожалуйста, авторизируйтесь.',
@@ -86,6 +122,7 @@ export default {
         delete: {
           success: 'Пользователь успешно удалён',
           accessError: 'Вы не можете удалить другого пользователя',
+          hasTasks: 'Нельзя удалить пользователя, связанного с задачей',
         },
       },
       session: {
@@ -110,6 +147,26 @@ export default {
         delete: {
           success: 'Статус успешно удалён',
           notFound: 'Статус не найден',
+          hasTasks: 'Нельзя удалить статус, связанный с задачей',
+        },
+      },
+      tasks: {
+        create: {
+          success: 'Задача успешно создана',
+          error: 'Не удалось создать задачу',
+        },
+        show: {
+          notFound: 'Задача не найдена',
+        },
+        edit: {
+          success: 'Задача успешно изменена',
+          error: 'Не удалось изменить задачу',
+          notFound: 'Задача не найдена',
+        },
+        delete: {
+          success: 'Задача успешно удалена',
+          notFound: 'Задача не найдена',
+          accessError: 'Задачу может удалить только её автор',
         },
       },
     },

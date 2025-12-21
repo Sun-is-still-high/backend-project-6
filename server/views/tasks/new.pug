@@ -1,0 +1,54 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.tasks.new.title')
+
+  form(method="post" action="/tasks")
+    .mb-3
+      label.form-label(for="data_name")= t('views.tasks.name')
+      input#data_name.form-control(
+        type="text"
+        name="data[name]"
+        value=task.name || ''
+        required
+        class=errors.name ? 'is-invalid' : ''
+      )
+      if errors.name
+        .invalid-feedback= errors.name[0].message
+
+    .mb-3
+      label.form-label(for="data_description")= t('views.tasks.description')
+      textarea#data_description.form-control(
+        name="data[description]"
+        rows="3"
+        class=errors.description ? 'is-invalid' : ''
+      )= task.description || ''
+      if errors.description
+        .invalid-feedback= errors.description[0].message
+
+    .mb-3
+      label.form-label(for="data_statusId")= t('views.tasks.status')
+      select#data_statusId.form-select(
+        name="data[statusId]"
+        required
+        class=errors.statusId ? 'is-invalid' : ''
+      )
+        option(value="")= t('views.tasks.selectStatus')
+        each status in statuses
+          option(value=status.id selected=(task.statusId == status.id))= status.name
+      if errors.statusId
+        .invalid-feedback= errors.statusId[0].message
+
+    .mb-3
+      label.form-label(for="data_executorId")= t('views.tasks.executor')
+      select#data_executorId.form-select(
+        name="data[executorId]"
+        class=errors.executorId ? 'is-invalid' : ''
+      )
+        option(value="")= t('views.tasks.selectExecutor')
+        each user in users
+          option(value=user.id selected=(task.executorId == user.id))= user.fullName
+      if errors.executorId
+        .invalid-feedback= errors.executorId[0].message
+
+    button.btn.btn-primary(type="submit")= t('views.tasks.new.submit')

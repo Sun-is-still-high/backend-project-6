@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import TaskStatus from '../models/TaskStatus.js';
+import Task from '../models/Task.js';
 
 export default (app) => {
   app.get('/statuses', async (request, reply) => {
@@ -128,6 +129,12 @@ export default (app) => {
     const status = await TaskStatus.query().findById(id);
     if (!status) {
       request.flash('error', i18next.t('flash.statuses.delete.notFound'));
+      return reply.redirect('/statuses');
+    }
+
+    const tasksCount = await Task.query().where('status_id', id).resultSize();
+    if (tasksCount > 0) {
+      request.flash('error', i18next.t('flash.statuses.delete.hasTasks'));
       return reply.redirect('/statuses');
     }
 

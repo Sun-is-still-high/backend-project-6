@@ -1,0 +1,28 @@
+extends ../layouts/application.pug
+
+block content
+  h1= task.name
+
+  table.table
+    tbody
+      tr
+        th= t('views.tasks.name')
+        td= task.name
+      tr
+        th= t('views.tasks.description')
+        td= task.description || ''
+      tr
+        th= t('views.tasks.status')
+        td= task.status ? task.status.name : ''
+      tr
+        th= t('views.tasks.creator')
+        td= task.creator ? task.creator.fullName : ''
+      tr
+        th= t('views.tasks.executor')
+        td= task.executor ? task.executor.fullName : ''
+      tr
+        th= t('views.tasks.createdAt')
+        td= task.createdAt
+
+  a.btn.btn-warning.me-2(href=`/tasks/${task.id}/edit`)= t('views.tasks.show.edit')
+  a.btn.btn-secondary(href="/tasks")= t('views.tasks.show.back')

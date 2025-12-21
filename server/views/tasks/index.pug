@@ -1,0 +1,31 @@
+extends ../layouts/application.pug
+
+block content
+  h1= t('views.tasks.index.title')
+
+  a.btn.btn-primary.mb-3(href="/tasks/new")= t('views.tasks.index.createLink')
+
+  table.table.table-striped
+    thead
+      tr
+        th= t('views.tasks.id')
+        th= t('views.tasks.name')
+        th= t('views.tasks.status')
+        th= t('views.tasks.creator')
+        th= t('views.tasks.executor')
+        th= t('views.tasks.createdAt')
+        th= t('views.tasks.actions')
+    tbody
+      each task in tasks
+        tr
+          td= task.id
+          td
+            a(href=`/tasks/${task.id}`)= task.name
+          td= task.status ? task.status.name : ''
+          td= task.creator ? task.creator.fullName : ''
+          td= task.executor ? task.executor.fullName : ''
+          td= task.createdAt
+          td
+            a.btn.btn-sm.btn-warning.me-1(href=`/tasks/${task.id}/edit`)= t('views.tasks.index.edit')
+            form.d-inline(method="post" action=`/tasks/${task.id}?_method=DELETE`)
+              button.btn.btn-sm.btn-danger(type="submit")= t('views.tasks.index.delete')

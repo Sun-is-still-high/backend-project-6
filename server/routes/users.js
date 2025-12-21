@@ -1,5 +1,6 @@
 import i18next from 'i18next';
 import User from '../models/User.js';
+import Task from '../models/Task.js';
 import { encrypt } from '../lib/secure.js';
 
 export default (app) => {
@@ -136,6 +137,16 @@ export default (app) => {
 
     if (currentUser.id !== Number(id)) {
       request.flash('error', i18next.t('flash.users.delete.accessError'));
+      return reply.redirect('/users');
+    }
+
+    const tasksCount = await Task.query()
+      .where('creator_id', id)
+      .orWhere('executor_id', id)
+      .resultSize();
+
+    if (tasksCount > 0) {
+      request.flash('error', i18next.t('flash.users.delete.hasTasks'));
       return reply.redirect('/users');
     }
 
