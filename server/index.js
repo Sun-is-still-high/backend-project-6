@@ -12,6 +12,7 @@ import pug from 'pug';
 import i18next from 'i18next';
 import Knex from 'knex';
 import { Model } from 'objection';
+import rollbar from './lib/rollbar.js';
 
 import en from './locales/en.js';
 import ru from './locales/ru.js';
@@ -108,6 +109,12 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
   setupDatabase(fastify, config);
   await registerPlugins(fastify);
   await addRoutes(fastify);
+
+  fastify.setErrorHandler((error, request, reply) => {
+    rollbar.error(error, request);
+    fastify.log.error(error);
+    reply.status(500).send({ error: 'Internal Server Error' });
+  });
 
   return fastify;
 };
