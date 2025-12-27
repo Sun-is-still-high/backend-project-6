@@ -27,7 +27,7 @@ html.h-100(lang="ru")
               li.nav-item
                 a.nav-link(href=`/users/${currentUser.id}/edit`)= currentUser.fullName
               li.nav-item
-                form.d-inline(method="post" action="/session?_method=DELETE")
+                form.d-inline(method="post" action="/session/delete")
                   button.btn.nav-link(type="submit")= t('layouts.navbar.signOut')
             else
               li.nav-item

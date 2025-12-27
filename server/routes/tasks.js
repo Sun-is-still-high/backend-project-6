@@ -295,6 +295,130 @@ export default (app) => {
     }
   });
 
+  app.post('/tasks/:id', async (request, reply) => {
+    const method = request.query._method?.toUpperCase();
+    if (method === 'PATCH') {
+      const { id } = request.params;
+      const currentUser = request.currentUser;
+
+      if (!currentUser) {
+        request.flash('error', i18next.t('flash.authError'));
+        return reply.redirect('/session/new');
+      }
+
+      const task = await Task.query().findById(id);
+      if (!task) {
+        request.flash('error', i18next.t('flash.tasks.edit.notFound'));
+        return reply.redirect('/tasks');
+      }
+
+      const { data } = request.body;
+
+      if (!data) {
+        request.flash('error', i18next.t('flash.tasks.edit.error'));
+        const taskWithLabels = await Task.query().findById(id).withGraphFetched('labels');
+        const statuses = await TaskStatus.query();
+        const users = await User.query();
+        const labels = await Label.query();
+        return reply.code(422).render('tasks/edit.pug', {
+          task: taskWithLabels,
+          statuses,
+          users,
+          labels,
+          errors: { name: [{ message: i18next.t('views.tasks.errors.nameRequired') }] },
+        });
+      }
+
+      const errors = {};
+
+      if (!data.name || data.name.length < 1) {
+        errors.name = [{ message: i18next.t('views.tasks.errors.nameRequired') }];
+      }
+      if (!data.statusId) {
+        errors.statusId = [{ message: i18next.t('views.tasks.errors.statusRequired') }];
+      }
+
+      if (Object.keys(errors).length > 0) {
+        request.flash('error', i18next.t('flash.tasks.edit.error'));
+        const statuses = await TaskStatus.query();
+        const users = await User.query();
+        const labels = await Label.query();
+        return reply.code(422).render('tasks/edit.pug', {
+          task: { ...task, ...data, labelIds: data.labels },
+          statuses,
+          users,
+          labels,
+          errors,
+        });
+      }
+
+      const taskData = {
+        name: data.name,
+        description: data.description || null,
+        statusId: Number(data.statusId),
+        executorId: data.executorId ? Number(data.executorId) : null,
+      };
+
+      const labelIds = data.labels
+        ? (Array.isArray(data.labels) ? data.labels : [data.labels]).map(Number)
+        : [];
+
+      try {
+        const knex = Task.knex();
+        await task.$query().patch(taskData);
+
+        await knex('tasks_labels').where('task_id', id).delete();
+        if (labelIds.length > 0) {
+          const labelRows = labelIds.map((labelId) => ({
+            task_id: Number(id),
+            label_id: labelId,
+          }));
+          await knex('tasks_labels').insert(labelRows);
+        }
+
+        request.flash('info', i18next.t('flash.tasks.edit.success'));
+        return reply.redirect('/tasks');
+      } catch (error) {
+        request.flash('error', i18next.t('flash.tasks.edit.error'));
+        const statuses = await TaskStatus.query();
+        const users = await User.query();
+        const labels = await Label.query();
+        return reply.code(422).render('tasks/edit.pug', {
+          task: { ...task, ...data, labelIds: data.labels },
+          statuses,
+          users,
+          labels,
+          errors: error.data || {},
+        });
+      }
+    }
+    if (method === 'DELETE') {
+      const { id } = request.params;
+      const currentUser = request.currentUser;
+
+      if (!currentUser) {
+        request.flash('error', i18next.t('flash.authError'));
+        return reply.redirect('/session/new');
+      }
+
+      const task = await Task.query().findById(id);
+      if (!task) {
+        request.flash('error', i18next.t('flash.tasks.delete.notFound'));
+        return reply.redirect('/tasks');
+      }
+
+      if (task.creatorId !== currentUser.id) {
+        request.flash('error', i18next.t('flash.tasks.delete.accessError'));
+        return reply.redirect('/tasks');
+      }
+
+      await Task.query().deleteById(id);
+      request.flash('info', i18next.t('flash.tasks.delete.success'));
+      return reply.redirect('/tasks');
+    }
+    return reply.code(405).send({ error: 'Method not allowed' });
+  });
+
   app.delete('/tasks/:id', async (request, reply) => {
     const { id } = request.params;
     const currentUser = request.currentUser;

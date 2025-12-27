@@ -1,6 +1,5 @@
 // @ts-check
 
-import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Fastify from 'fastify';
@@ -106,19 +105,8 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
 
   const fastify = Fastify({
     logger: envName !== 'test',
-    serverFactory: (handler) => {
-      return http.createServer((req, res) => {
-        if (req.method === 'POST' && req.url) {
-          const url = new URL(req.url, `http://${req.headers.host}`);
-          const method = url.searchParams.get('_method');
-          if (method) {
-            req.method = method.toUpperCase();
-          }
-        }
-        handler(req, res);
-      });
-    },
   });
+
 
   setupDatabase(fastify, config);
   await registerPlugins(fastify);

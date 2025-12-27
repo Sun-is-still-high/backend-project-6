@@ -3,6 +3,90 @@ import User from '../models/User.js';
 import Task from '../models/Task.js';
 import { encrypt } from '../lib/secure.js';
 
+const handleUserUpdate = async (app, request, reply) => {
+  const { id } = request.params;
+  const currentUser = request.currentUser;
+
+  if (!currentUser) {
+    request.flash('error', i18next.t('flash.authError'));
+    return reply.redirect('/session/new');
+  }
+
+  if (currentUser.id !== Number(id)) {
+    request.flash('error', i18next.t('flash.users.edit.accessError'));
+    return reply.redirect('/users');
+  }
+
+  const user = await User.query().findById(id);
+  if (!user) {
+    request.flash('error', i18next.t('flash.users.edit.notFound'));
+    return reply.redirect('/users');
+  }
+
+  const { data } = request.body || {};
+  if (!data) {
+    request.flash('error', i18next.t('flash.users.edit.error'));
+    return reply.code(422).render('users/edit.pug', {
+      user,
+      errors: {},
+    });
+  }
+
+  const updateData = {
+    first_name: data.firstName,
+    last_name: data.lastName,
+    email: data.email,
+  };
+
+  if (data.password) {
+    updateData.password_digest = encrypt(data.password);
+  }
+
+  try {
+    const knex = User.knex();
+    await knex('users').where('id', Number(id)).update(updateData);
+    request.flash('info', i18next.t('flash.users.edit.success'));
+    return reply.redirect('/users');
+  } catch (error) {
+    console.error('User update error:', error);
+    request.flash('error', i18next.t('flash.users.edit.error'));
+    return reply.code(422).render('users/edit.pug', {
+      user: { ...user, ...data },
+      errors: error.data || {},
+    });
+  }
+};
+
+const handleUserDelete = async (app, request, reply) => {
+  const { id } = request.params;
+  const currentUser = request.currentUser;
+
+  if (!currentUser) {
+    request.flash('error', i18next.t('flash.authError'));
+    return reply.redirect('/session/new');
+  }
+
+  if (currentUser.id !== Number(id)) {
+    request.flash('error', i18next.t('flash.users.delete.accessError'));
+    return reply.redirect('/users');
+  }
+
+  const tasksCount = await Task.query()
+    .where('creator_id', id)
+    .orWhere('executor_id', id)
+    .resultSize();
+
+  if (tasksCount > 0) {
+    request.flash('error', i18next.t('flash.users.delete.hasTasks'));
+    return reply.redirect('/users');
+  }
+
+  await User.query().deleteById(id);
+  request.logOut();
+  request.flash('info', i18next.t('flash.users.delete.success'));
+  return reply.redirect('/users');
+};
+
 export default (app) => {
   app.get('/users', async (request, reply) => {
     const users = await User.query();
@@ -91,85 +175,21 @@ export default (app) => {
   });
 
   app.patch('/users/:id', async (request, reply) => {
-    const { id } = request.params;
-    const currentUser = request.currentUser;
+    return handleUserUpdate(app, request, reply);
+  });
 
-    if (!currentUser) {
-      request.flash('error', i18next.t('flash.authError'));
-      return reply.redirect('/session/new');
+  app.post('/users/:id', async (request, reply) => {
+    const method = request.query._method?.toUpperCase();
+    if (method === 'PATCH') {
+      return handleUserUpdate(app, request, reply);
     }
-
-    if (currentUser.id !== Number(id)) {
-      request.flash('error', i18next.t('flash.users.edit.accessError'));
-      return reply.redirect('/users');
+    if (method === 'DELETE') {
+      return handleUserDelete(app, request, reply);
     }
-
-    const user = await User.query().findById(id);
-    if (!user) {
-      request.flash('error', i18next.t('flash.users.edit.notFound'));
-      return reply.redirect('/users');
-    }
-
-    const { data } = request.body;
-    if (!data) {
-      request.flash('error', i18next.t('flash.users.edit.error'));
-      return reply.code(422).render('users/edit.pug', {
-        user,
-        errors: {},
-      });
-    }
-
-    const updateData = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-    };
-
-    if (data.password) {
-      updateData.passwordDigest = encrypt(data.password);
-    }
-
-    try {
-      await User.query().findById(id).patch(updateData);
-      request.flash('info', i18next.t('flash.users.edit.success'));
-      return reply.redirect('/users');
-    } catch (error) {
-      console.error('User update error:', error);
-      request.flash('error', i18next.t('flash.users.edit.error'));
-      return reply.code(422).render('users/edit.pug', {
-        user: { ...user, ...data },
-        errors: error.data || {},
-      });
-    }
+    return reply.code(405).send({ error: 'Method not allowed' });
   });
 
   app.delete('/users/:id', async (request, reply) => {
-    const { id } = request.params;
-    const currentUser = request.currentUser;
-
-    if (!currentUser) {
-      request.flash('error', i18next.t('flash.authError'));
-      return reply.redirect('/session/new');
-    }
-
-    if (currentUser.id !== Number(id)) {
-      request.flash('error', i18next.t('flash.users.delete.accessError'));
-      return reply.redirect('/users');
-    }
-
-    const tasksCount = await Task.query()
-      .where('creator_id', id)
-      .orWhere('executor_id', id)
-      .resultSize();
-
-    if (tasksCount > 0) {
-      request.flash('error', i18next.t('flash.users.delete.hasTasks'));
-      return reply.redirect('/users');
-    }
-
-    await User.query().deleteById(id);
-    request.logOut();
-    request.flash('info', i18next.t('flash.users.delete.success'));
-    return reply.redirect('/users');
+    return handleUserDelete(app, request, reply);
   });
 };

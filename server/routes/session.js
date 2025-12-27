@@ -48,4 +48,10 @@ export default (app) => {
     request.flash('info', i18next.t('flash.session.delete.success'));
     return reply.redirect('/');
   });
+
+  app.post('/session/delete', async (request, reply) => {
+    await request.logOut();
+    request.flash('info', i18next.t('flash.session.delete.success'));
+    return reply.redirect('/');
+  });
 };
