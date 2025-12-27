@@ -57,7 +57,7 @@ export default (app) => {
     try {
       await User.query().insert(userData);
       request.flash('info', i18next.t('flash.users.create.success'));
-      return reply.redirect('/session/new');
+      return reply.redirect('/');
     } catch (error) {
       request.flash('error', i18next.t('flash.users.create.error'));
       return reply.code(422).render('users/new.pug', {
