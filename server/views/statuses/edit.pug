@@ -10,11 +10,10 @@ block content
         type="text"
         name="data[name]"
         value=status.name || ''
-        required
-        class=errors.name ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.name}
       )
-      if errors.name
-        .invalid-feedback= errors.name[0].message
+      if errors && errors.name
+        .invalid-feedback.d-block= errors.name[0].message
 
     button.btn.btn-primary.me-2(type="submit")= t('views.statuses.edit.submit')
 

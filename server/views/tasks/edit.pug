@@ -10,46 +10,44 @@ block content
         type="text"
         name="data[name]"
         value=task.name || ''
-        required
-        class=errors.name ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.name}
       )
-      if errors.name
-        .invalid-feedback= errors.name[0].message
+      if errors && errors.name
+        .invalid-feedback.d-block= errors.name[0].message
 
     .mb-3
       label.form-label(for="data_description")= t('views.tasks.description')
       textarea#data_description.form-control(
         name="data[description]"
         rows="3"
-        class=errors.description ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.description}
       )= task.description || ''
-      if errors.description
-        .invalid-feedback= errors.description[0].message
+      if errors && errors.description
+        .invalid-feedback.d-block= errors.description[0].message
 
     .mb-3
       label.form-label(for="data_statusId")= t('views.tasks.status')
       select#data_statusId.form-select(
         name="data[statusId]"
-        required
-        class=errors.statusId ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.statusId}
       )
         option(value="")= t('views.tasks.selectStatus')
         each status in statuses
           option(value=status.id selected=(task.statusId == status.id))= status.name
-      if errors.statusId
-        .invalid-feedback= errors.statusId[0].message
+      if errors && errors.statusId
+        .invalid-feedback.d-block= errors.statusId[0].message
 
     .mb-3
       label.form-label(for="data_executorId")= t('views.tasks.executor')
       select#data_executorId.form-select(
         name="data[executorId]"
-        class=errors.executorId ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.executorId}
       )
         option(value="")= t('views.tasks.selectExecutor')
         each user in users
           option(value=user.id selected=(task.executorId == user.id))= user.fullName
-      if errors.executorId
-        .invalid-feedback= errors.executorId[0].message
+      if errors && errors.executorId
+        .invalid-feedback.d-block= errors.executorId[0].message
 
     .mb-3
       label.form-label(for="data_labels")= t('views.tasks.labels')
