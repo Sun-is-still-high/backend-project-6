@@ -173,7 +173,7 @@ export default (app) => {
   });
 
   app.post('/statuses/:id', async (request, reply) => {
-    const method = request.query._method?.toUpperCase();
+    const method = request.body?._method?.toUpperCase();
     if (method === 'PATCH') {
       return handleStatusUpdate(request, reply);
     }

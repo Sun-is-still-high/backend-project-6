@@ -3,7 +3,8 @@ extends ../layouts/application.pug
 block content
   h1= t('views.statuses.edit.title')
 
-  form(method="post" action=`/statuses/${status.id}?_method=PATCH`)
+  form(method="post" action=`/statuses/${status.id}`)
+    input(type="hidden" name="_method" value="PATCH")
     .mb-3
       label.form-label(for="data_name")= t('views.statuses.name')
       input#data_name.form-control(
@@ -19,5 +20,6 @@ block content
 
   hr
 
-  form.mt-3(method="post" action=`/statuses/${status.id}?_method=DELETE`)
+  form.mt-3(method="post" action=`/statuses/${status.id}`)
+    input(type="hidden" name="_method" value="DELETE")
     button.btn.btn-danger(type="submit")= t('views.statuses.edit.delete')

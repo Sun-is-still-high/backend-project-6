@@ -296,7 +296,7 @@ export default (app) => {
   });
 
   app.post('/tasks/:id', async (request, reply) => {
-    const method = request.query._method?.toUpperCase();
+    const method = request.body?._method?.toUpperCase();
     if (method === 'PATCH') {
       const { id } = request.params;
       const currentUser = request.currentUser;
