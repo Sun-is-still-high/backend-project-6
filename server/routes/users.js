@@ -36,17 +36,12 @@ const handleUserUpdate = async (app, request, reply) => {
   }
 
   try {
-    const knex = User.knex();
-    const updateData = {
-      first_name: patchData.firstName,
-      last_name: patchData.lastName,
+    await user.$query().patch({
+      firstName: patchData.firstName,
+      lastName: patchData.lastName,
       email: patchData.email,
-    };
-    if (patchData.passwordDigest) {
-      updateData.password_digest = patchData.passwordDigest;
-    }
-
-    await knex('users').where('id', Number(id)).update(updateData);
+      ...(patchData.passwordDigest ? { passwordDigest: patchData.passwordDigest } : {}),
+    });
 
     request.flash('info', i18next.t('flash.users.edit.success'));
     return reply.redirect('/users');
