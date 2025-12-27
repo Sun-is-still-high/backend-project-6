@@ -120,19 +120,27 @@ export default (app) => {
     }
 
     const updateData = {
-      first_name: data.firstName,
-      last_name: data.lastName,
+      firstName: data.firstName,
+      lastName: data.lastName,
       email: data.email,
     };
 
     if (data.password) {
-      updateData.password_digest = encrypt(data.password);
+      updateData.passwordDigest = encrypt(data.password);
     }
 
-    const knex = User.knex();
-    await knex('users').where('id', id).update(updateData);
-    request.flash('info', i18next.t('flash.users.edit.success'));
-    return reply.redirect('/users');
+    try {
+      await user.$query().patch(updateData);
+      request.flash('info', i18next.t('flash.users.edit.success'));
+      return reply.redirect('/users');
+    } catch (error) {
+      console.error('User update error:', error);
+      request.flash('error', i18next.t('flash.users.edit.error'));
+      return reply.code(422).render('users/edit.pug', {
+        user: { ...user, ...data },
+        errors: error.data || {},
+      });
+    }
   });
 
   app.delete('/users/:id', async (request, reply) => {
