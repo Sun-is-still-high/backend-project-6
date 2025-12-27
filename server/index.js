@@ -39,6 +39,7 @@ const setupDatabase = (app, config) => {
   const knex = Knex(config);
   Model.knex(knex);
   app.decorate('knex', knex);
+  app.decorate('objection', { knex });
   return knex;
 };
 
