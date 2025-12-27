@@ -28,3 +28,5 @@ export const production = {
   connection: process.env.DATABASE_URL,
   migrations,
 };
+
+export default { development, test, production };

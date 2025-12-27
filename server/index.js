@@ -96,7 +96,7 @@ const registerPlugins = async (app) => {
 const app = async (envName = process.env.NODE_ENV || 'development') => {
   await setupLocalization();
 
-  const config = knexConfig[envName];
+  const config = knexConfig[envName] || knexConfig.development;
 
   const fastify = Fastify({
     logger: envName !== 'test',
