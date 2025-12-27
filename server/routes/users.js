@@ -119,17 +119,18 @@ export default (app) => {
       });
     }
 
-    const userData = {
-      firstName: data.firstName,
-      lastName: data.lastName,
+    const updateData = {
+      first_name: data.firstName,
+      last_name: data.lastName,
       email: data.email,
     };
 
     if (data.password) {
-      userData.passwordDigest = encrypt(data.password);
+      updateData.password_digest = encrypt(data.password);
     }
 
-    await user.$query().patch(userData).skipValidation();
+    const knex = User.knex();
+    await knex('users').where('id', id).update(updateData);
     request.flash('info', i18next.t('flash.users.edit.success'));
     return reply.redirect('/users');
   });

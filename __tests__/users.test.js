@@ -90,7 +90,7 @@ describe('Users CRUD', () => {
       });
 
       expect(response.statusCode).toBe(302);
-      expect(response.headers.location).toBe('/session/new');
+      expect(response.headers.location).toBe('/');
 
       const users = await knex('users').select();
       expect(users).toHaveLength(1);
