@@ -9,6 +9,15 @@ export default (app) => {
 
   app.post('/session', async (request, reply) => {
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.session.create.error'));
+      return reply.code(422).render('session/new.pug', {
+        email: '',
+        errors: { email: [{ message: 'Данные не получены' }] },
+      });
+    }
+
     const { email, password } = data;
 
     const user = await User.query().findOne({ email });

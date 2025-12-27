@@ -49,10 +49,24 @@ describe('Labels CRUD', () => {
   });
 
   describe('GET /labels', () => {
-    it('should return labels list page', async () => {
+    it('should redirect unauthenticated users to login', async () => {
       const response = await server.inject({
         method: 'GET',
         url: '/labels',
+      });
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/session/new');
+    });
+
+    it('should return labels list page for authenticated users', async () => {
+      await createUser();
+      const cookies = await signIn();
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/labels',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -60,12 +74,15 @@ describe('Labels CRUD', () => {
     });
 
     it('should show all labels', async () => {
+      await createUser();
+      const cookies = await signIn();
       await knex('labels').insert({ name: 'Важное' });
       await knex('labels').insert({ name: 'Срочное' });
 
       const response = await server.inject({
         method: 'GET',
         url: '/labels',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);

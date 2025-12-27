@@ -1,11 +1,13 @@
 export default {
   translation: {
-    appName: 'Fastify Blog',
+    appName: 'Task Manager',
     layouts: {
       navbar: {
-        brand: 'Fastify Blog',
-        home: 'Home',
+        brand: 'Task Manager',
         users: 'Users',
+        statuses: 'Statuses',
+        tasks: 'Tasks',
+        labels: 'Labels',
         signIn: 'Sign In',
         signUp: 'Sign Up',
         signOut: 'Sign Out',
@@ -13,8 +15,9 @@ export default {
     },
     views: {
       index: {
-        welcome: 'Welcome to Fastify Blog!',
-        description: 'A simple blog application built with Fastify',
+        welcome: 'Hello from Hexlet!',
+        description: 'Practical programming courses',
+        learnMore: 'Learn More',
       },
       users: {
         id: 'ID',

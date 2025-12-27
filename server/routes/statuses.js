@@ -4,6 +4,13 @@ import Task from '../models/Task.js';
 
 export default (app) => {
   app.get('/statuses', async (request, reply) => {
+    const currentUser = request.currentUser;
+
+    if (!currentUser) {
+      request.flash('error', i18next.t('flash.authError'));
+      return reply.redirect('/session/new');
+    }
+
     const statuses = await TaskStatus.query();
     return reply.render('statuses/index.pug', { statuses });
   });
@@ -29,6 +36,15 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.statuses.create.error'));
+      return reply.code(422).render('statuses/new.pug', {
+        status: {},
+        errors: { name: [{ message: i18next.t('views.statuses.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {
@@ -90,6 +106,15 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.statuses.edit.error'));
+      return reply.code(422).render('statuses/edit.pug', {
+        status,
+        errors: { name: [{ message: i18next.t('views.statuses.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {

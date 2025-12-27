@@ -1,27 +1,35 @@
 extends ../layouts/application.pug
 
 block content
-  h1= t('views.session.new.title')
+  .row.justify-content-center
+    .col-12.col-md-10.col-lg-8
+      .card.shadow-sm
+        .card-body.p-5
+          .row
+            .col-md-6.d-none.d-md-flex.align-items-center.justify-content-center
+              img(src="https://js-task-manager-ru.hexlet.app/assets/avatar.jpg" alt="" style="max-width: 200px; height: auto;")
+            .col-md-6
+              h1.mb-4.fw-bold= t('views.session.new.title')
 
-  form(method="post" action="/session")
-    .mb-3
-      label.form-label(for="data_email")= t('views.users.email')
-      input#data_email.form-control(
-        type="email"
-        name="data[email]"
-        value=email || ''
-        required
-        class=errors.email ? 'is-invalid' : ''
-      )
-      if errors.email
-        .invalid-feedback= errors.email[0].message
+              form(method="post" action="/session")
+                .mb-3
+                  input#data_email.form-control(
+                    type="email"
+                    name="data[email]"
+                    value=email || ''
+                    required
+                    placeholder=t('views.users.email')
+                    class=errors.email ? 'is-invalid' : ''
+                  )
+                  if errors.email
+                    .invalid-feedback= errors.email[0].message
 
-    .mb-3
-      label.form-label(for="data_password")= t('views.users.password')
-      input#data_password.form-control(
-        type="password"
-        name="data[password]"
-        required
-      )
+                .mb-3
+                  input#data_password.form-control(
+                    type="password"
+                    name="data[password]"
+                    required
+                    placeholder=t('views.users.password')
+                  )
 
-    button.btn.btn-primary(type="submit")= t('views.session.new.submit')
+                button.btn.btn-primary.fw-bold(type="submit")= t('views.session.new.submit')

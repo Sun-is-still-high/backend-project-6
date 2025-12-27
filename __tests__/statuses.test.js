@@ -46,10 +46,24 @@ describe('Statuses CRUD', () => {
   });
 
   describe('GET /statuses', () => {
-    it('should return statuses list page', async () => {
+    it('should redirect unauthenticated users to login', async () => {
       const response = await server.inject({
         method: 'GET',
         url: '/statuses',
+      });
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/session/new');
+    });
+
+    it('should return statuses list page for authenticated users', async () => {
+      await createUser();
+      const cookies = await signIn();
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/statuses',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -57,12 +71,15 @@ describe('Statuses CRUD', () => {
     });
 
     it('should show all statuses', async () => {
+      await createUser();
+      const cookies = await signIn();
       await knex('task_statuses').insert({ name: 'Новый' });
       await knex('task_statuses').insert({ name: 'В работе' });
 
       const response = await server.inject({
         method: 'GET',
         url: '/statuses',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);

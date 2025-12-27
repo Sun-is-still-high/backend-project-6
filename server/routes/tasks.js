@@ -6,8 +6,14 @@ import Label from '../models/Label.js';
 
 export default (app) => {
   app.get('/tasks', async (request, reply) => {
-    const { status, executor, label, isCreatorUser } = request.query;
     const currentUser = request.currentUser;
+
+    if (!currentUser) {
+      request.flash('error', i18next.t('flash.authError'));
+      return reply.redirect('/session/new');
+    }
+
+    const { status, executor, label, isCreatorUser } = request.query;
 
     let query = Task.query().withGraphFetched('[status, creator, executor, labels]');
 
@@ -68,6 +74,21 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.tasks.create.error'));
+      const statuses = await TaskStatus.query();
+      const users = await User.query();
+      const labels = await Label.query();
+      return reply.code(422).render('tasks/new.pug', {
+        task: {},
+        statuses,
+        users,
+        labels,
+        errors: { name: [{ message: i18next.t('views.tasks.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {
@@ -133,6 +154,13 @@ export default (app) => {
   });
 
   app.get('/tasks/:id', async (request, reply) => {
+    const currentUser = request.currentUser;
+
+    if (!currentUser) {
+      request.flash('error', i18next.t('flash.authError'));
+      return reply.redirect('/session/new');
+    }
+
     const { id } = request.params;
 
     const task = await Task.query()
@@ -186,6 +214,22 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.tasks.edit.error'));
+      const taskWithLabels = await Task.query().findById(id).withGraphFetched('labels');
+      const statuses = await TaskStatus.query();
+      const users = await User.query();
+      const labels = await Label.query();
+      return reply.code(422).render('tasks/edit.pug', {
+        task: taskWithLabels,
+        statuses,
+        users,
+        labels,
+        errors: { name: [{ message: i18next.t('views.tasks.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {

@@ -1,10 +1,9 @@
 export default {
   translation: {
-    appName: 'Fastify Блог',
+    appName: 'Менеджер задач',
     layouts: {
       navbar: {
-        brand: 'Fastify Блог',
-        home: 'Главная',
+        brand: 'Менеджер задач',
         users: 'Пользователи',
         statuses: 'Статусы',
         tasks: 'Задачи',
@@ -16,8 +15,9 @@ export default {
     },
     views: {
       index: {
-        welcome: 'Добро пожаловать в Fastify Блог!',
-        description: 'Простое блог-приложение на Fastify',
+        welcome: 'Привет от Хекслета!',
+        description: 'Практические курсы по программированию',
+        learnMore: 'Узнать больше',
       },
       users: {
         id: 'ID',
@@ -30,7 +30,7 @@ export default {
         actions: 'Действия',
         new: {
           title: 'Регистрация',
-          submit: 'Зарегистрировать',
+          submit: 'Сохранить',
         },
         edit: {
           title: 'Редактирование пользователя',

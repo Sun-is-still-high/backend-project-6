@@ -1,12 +1,12 @@
 doctype html
-html(lang="ru")
+html.h-100(lang="ru")
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     title= t('appName')
     link(rel="stylesheet" href="/assets/styles.css")
-  body
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+  body.d-flex.flex-column.h-100.bg-light
+    nav.navbar.navbar-expand-lg.navbar-light.bg-white
       .container
         a.navbar-brand(href="/")= t('layouts.navbar.brand')
         button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav")
@@ -14,15 +14,14 @@ html(lang="ru")
         #navbarNav.collapse.navbar-collapse
           ul.navbar-nav.me-auto
             li.nav-item
-              a.nav-link(href="/")= t('layouts.navbar.home')
-            li.nav-item
               a.nav-link(href="/users")= t('layouts.navbar.users')
-            li.nav-item
-              a.nav-link(href="/statuses")= t('layouts.navbar.statuses')
-            li.nav-item
-              a.nav-link(href="/tasks")= t('layouts.navbar.tasks')
-            li.nav-item
-              a.nav-link(href="/labels")= t('layouts.navbar.labels')
+            if currentUser
+              li.nav-item
+                a.nav-link(href="/statuses")= t('layouts.navbar.statuses')
+              li.nav-item
+                a.nav-link(href="/tasks")= t('layouts.navbar.tasks')
+              li.nav-item
+                a.nav-link(href="/labels")= t('layouts.navbar.labels')
           ul.navbar-nav
             if currentUser
               li.nav-item
@@ -36,7 +35,7 @@ html(lang="ru")
               li.nav-item
                 a.nav-link(href="/users/new")= t('layouts.navbar.signUp')
 
-    main.container.mt-4
+    main.container.mt-4.flex-grow-1
       if flash.info
         .alert.alert-info.alert-dismissible.fade.show(role="alert")
           = flash.info
@@ -46,5 +45,9 @@ html(lang="ru")
           = flash.error
           button.btn-close(type="button" data-bs-dismiss="alert" aria-label="Close")
       block content
+
+    footer.footer.bg-dark.py-3.mt-auto
+      .container.text-center
+        span.text-white © Hexlet Ltd, 2021
 
     script(src="/assets/main.js")

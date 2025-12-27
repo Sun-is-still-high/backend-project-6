@@ -1,11 +1,13 @@
 // @ts-check
 
+import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Fastify from 'fastify';
 import view from '@fastify/view';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
+import qs from 'qs';
 import fastifySecureSession from '@fastify/secure-session';
 import fastifyPassport from '@fastify/passport';
 import pug from 'pug';
@@ -46,13 +48,7 @@ const registerPlugins = async (app) => {
     prefix: '/assets/',
   });
 
-  await app.register(formbody);
-
-  app.addHook('preHandler', async (request, reply) => {
-    if (request.method === 'POST' && request.query._method) {
-      request.raw.method = request.query._method.toUpperCase();
-    }
-  });
+  await app.register(formbody, { parser: (str) => qs.parse(str) });
 
   await app.register(fastifySecureSession, {
     secret: process.env.SESSION_SECRET || 'a-secret-with-minimum-length-of-32',
@@ -104,6 +100,18 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
 
   const fastify = Fastify({
     logger: envName !== 'test',
+    serverFactory: (handler) => {
+      return http.createServer((req, res) => {
+        if (req.method === 'POST' && req.url) {
+          const url = new URL(req.url, `http://${req.headers.host}`);
+          const method = url.searchParams.get('_method');
+          if (method) {
+            req.method = method.toUpperCase();
+          }
+        }
+        handler(req, res);
+      });
+    },
   });
 
   setupDatabase(fastify, config);
@@ -114,6 +122,11 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
     rollbar.error(error, request);
     fastify.log.error(error);
     reply.status(500).send({ error: 'Internal Server Error' });
+  });
+
+  fastify.setNotFoundHandler((request, reply) => {
+    rollbar.warning(`404 Not Found: ${request.method} ${request.url}`, request);
+    reply.status(404).send({ error: 'Not Found' });
   });
 
   return fastify;

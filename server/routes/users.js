@@ -18,6 +18,14 @@ export default (app) => {
     const { data } = request.body;
     const errors = {};
 
+    if (!data) {
+      request.flash('error', i18next.t('flash.users.create.error'));
+      return reply.code(422).render('users/new.pug', {
+        user: {},
+        errors: { firstName: [{ message: 'Данные не получены' }] },
+      });
+    }
+
     if (!data.password || data.password.length < 3) {
       errors.password = [{ message: 'Пароль должен содержать минимум 3 символа' }];
     }

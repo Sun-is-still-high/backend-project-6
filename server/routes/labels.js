@@ -3,6 +3,13 @@ import Label from '../models/Label.js';
 
 export default (app) => {
   app.get('/labels', async (request, reply) => {
+    const currentUser = request.currentUser;
+
+    if (!currentUser) {
+      request.flash('error', i18next.t('flash.authError'));
+      return reply.redirect('/session/new');
+    }
+
     const labels = await Label.query();
     return reply.render('labels/index.pug', { labels });
   });
@@ -28,6 +35,15 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.labels.create.error'));
+      return reply.code(422).render('labels/new.pug', {
+        label: {},
+        errors: { name: [{ message: i18next.t('views.labels.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {
@@ -89,6 +105,15 @@ export default (app) => {
     }
 
     const { data } = request.body;
+
+    if (!data) {
+      request.flash('error', i18next.t('flash.labels.edit.error'));
+      return reply.code(422).render('labels/edit.pug', {
+        label,
+        errors: { name: [{ message: i18next.t('views.labels.errors.nameRequired') }] },
+      });
+    }
+
     const errors = {};
 
     if (!data.name || data.name.length < 1) {

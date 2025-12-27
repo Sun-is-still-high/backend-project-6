@@ -1,54 +1,62 @@
 extends ../layouts/application.pug
 
 block content
-  h1= t('views.users.new.title')
+  .row.justify-content-center
+    .col-12.col-md-10.col-lg-8
+      .card.shadow-sm
+        .card-body.p-5
+          .row
+            .col-md-6.d-none.d-md-flex.align-items-center.justify-content-center
+              img(src="https://js-task-manager-ru.hexlet.app/assets/avatar.jpg" alt="" style="max-width: 200px; height: auto;")
+            .col-md-6
+              h1.mb-4.fw-bold= t('views.users.new.title')
 
-  form(method="post" action="/users")
-    .mb-3
-      label.form-label(for="data_firstName")= t('views.users.firstName')
-      input#data_firstName.form-control(
-        type="text"
-        name="data[firstName]"
-        value=user.firstName || ''
-        required
-        class=errors.firstName ? 'is-invalid' : ''
-      )
-      if errors.firstName
-        .invalid-feedback= errors.firstName[0].message
+              form(method="post" action="/users")
+                .mb-3
+                  input#data_firstName.form-control(
+                    type="text"
+                    name="data[firstName]"
+                    value=user.firstName || ''
+                    required
+                    placeholder=t('views.users.firstName')
+                    class=errors.firstName ? 'is-invalid' : ''
+                  )
+                  if errors.firstName
+                    .invalid-feedback= errors.firstName[0].message
 
-    .mb-3
-      label.form-label(for="data_lastName")= t('views.users.lastName')
-      input#data_lastName.form-control(
-        type="text"
-        name="data[lastName]"
-        value=user.lastName || ''
-        required
-        class=errors.lastName ? 'is-invalid' : ''
-      )
-      if errors.lastName
-        .invalid-feedback= errors.lastName[0].message
+                .mb-3
+                  input#data_lastName.form-control(
+                    type="text"
+                    name="data[lastName]"
+                    value=user.lastName || ''
+                    required
+                    placeholder=t('views.users.lastName')
+                    class=errors.lastName ? 'is-invalid' : ''
+                  )
+                  if errors.lastName
+                    .invalid-feedback= errors.lastName[0].message
 
-    .mb-3
-      label.form-label(for="data_email")= t('views.users.email')
-      input#data_email.form-control(
-        type="email"
-        name="data[email]"
-        value=user.email || ''
-        required
-        class=errors.email ? 'is-invalid' : ''
-      )
-      if errors.email
-        .invalid-feedback= errors.email[0].message
+                .mb-3
+                  input#data_email.form-control(
+                    type="email"
+                    name="data[email]"
+                    value=user.email || ''
+                    required
+                    placeholder=t('views.users.email')
+                    class=errors.email ? 'is-invalid' : ''
+                  )
+                  if errors.email
+                    .invalid-feedback= errors.email[0].message
 
-    .mb-3
-      label.form-label(for="data_password")= t('views.users.password')
-      input#data_password.form-control(
-        type="password"
-        name="data[password]"
-        required
-        class=errors.password ? 'is-invalid' : ''
-      )
-      if errors.password
-        .invalid-feedback= errors.password[0].message
+                .mb-3
+                  input#data_password.form-control(
+                    type="password"
+                    name="data[password]"
+                    required
+                    placeholder=t('views.users.password')
+                    class=errors.password ? 'is-invalid' : ''
+                  )
+                  if errors.password
+                    .invalid-feedback= errors.password[0].message
 
-    button.btn.btn-primary(type="submit")= t('views.users.new.submit')
+                button.btn.btn-primary.fw-bold(type="submit")= t('views.users.new.submit')

@@ -54,10 +54,24 @@ describe('Tasks CRUD', () => {
   });
 
   describe('GET /tasks', () => {
-    it('should return tasks list page', async () => {
+    it('should redirect unauthenticated users to login', async () => {
       const response = await server.inject({
         method: 'GET',
         url: '/tasks',
+      });
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/session/new');
+    });
+
+    it('should return tasks list page for authenticated users', async () => {
+      await createUser();
+      const cookies = await signIn();
+
+      const response = await server.inject({
+        method: 'GET',
+        url: '/tasks',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -67,6 +81,7 @@ describe('Tasks CRUD', () => {
     it('should show all tasks with relations', async () => {
       const userId = await createUser();
       const statusId = await createStatus();
+      const cookies = await signIn();
 
       await knex('tasks').insert({
         name: 'Тестовая задача',
@@ -77,6 +92,7 @@ describe('Tasks CRUD', () => {
       const response = await server.inject({
         method: 'GET',
         url: '/tasks',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -203,9 +219,29 @@ describe('Tasks CRUD', () => {
   });
 
   describe('GET /tasks/:id', () => {
-    it('should show task details', async () => {
+    it('should redirect unauthenticated users to login', async () => {
       const userId = await createUser();
       const statusId = await createStatus();
+
+      const [taskId] = await knex('tasks').insert({
+        name: 'Тестовая задача',
+        status_id: statusId,
+        creator_id: userId,
+      });
+
+      const response = await server.inject({
+        method: 'GET',
+        url: `/tasks/${taskId}`,
+      });
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/session/new');
+    });
+
+    it('should show task details for authenticated users', async () => {
+      const userId = await createUser();
+      const statusId = await createStatus();
+      const cookies = await signIn();
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
@@ -217,6 +253,7 @@ describe('Tasks CRUD', () => {
       const response = await server.inject({
         method: 'GET',
         url: `/tasks/${taskId}`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -225,9 +262,13 @@ describe('Tasks CRUD', () => {
     });
 
     it('should redirect if task not found', async () => {
+      await createUser();
+      const cookies = await signIn();
+
       const response = await server.inject({
         method: 'GET',
         url: '/tasks/999',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(302);
@@ -461,6 +502,7 @@ describe('Tasks CRUD', () => {
       const userId = await createUser();
       const status1Id = await createStatus('Новый');
       const status2Id = await createStatus('В работе');
+      const cookies = await signIn();
 
       await knex('tasks').insert({
         name: 'Задача 1',
@@ -476,6 +518,7 @@ describe('Tasks CRUD', () => {
       const response = await server.inject({
         method: 'GET',
         url: `/tasks?status=${status1Id}`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -488,6 +531,7 @@ describe('Tasks CRUD', () => {
       const executor1Id = await createUser('executor1@example.com');
       const executor2Id = await createUser('executor2@example.com');
       const statusId = await createStatus();
+      const cookies = await signIn('creator@example.com');
 
       await knex('tasks').insert({
         name: 'Задача исполнителя 1',
@@ -505,6 +549,7 @@ describe('Tasks CRUD', () => {
       const response = await server.inject({
         method: 'GET',
         url: `/tasks?executor=${executor1Id}`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -515,6 +560,7 @@ describe('Tasks CRUD', () => {
     it('should filter tasks by label', async () => {
       const userId = await createUser();
       const statusId = await createStatus();
+      const cookies = await signIn();
 
       const [label1Id] = await knex('labels').insert({ name: 'Важное' });
       const [label2Id] = await knex('labels').insert({ name: 'Срочное' });
@@ -536,6 +582,7 @@ describe('Tasks CRUD', () => {
       const response = await server.inject({
         method: 'GET',
         url: `/tasks?label=${label1Id}`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
@@ -607,9 +654,13 @@ describe('Tasks CRUD', () => {
     });
 
     it('should show filter form with correct elements', async () => {
+      await createUser();
+      const cookies = await signIn();
+
       const response = await server.inject({
         method: 'GET',
         url: '/tasks',
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
       });
 
       expect(response.statusCode).toBe(200);
