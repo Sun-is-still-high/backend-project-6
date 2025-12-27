@@ -111,6 +111,14 @@ export default (app) => {
     }
 
     const { data } = request.body;
+    if (!data) {
+      request.flash('error', i18next.t('flash.users.edit.error'));
+      return reply.code(422).render('users/edit.pug', {
+        user,
+        errors: {},
+      });
+    }
+
     const userData = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -122,7 +130,7 @@ export default (app) => {
     }
 
     try {
-      await user.$query().patch(userData);
+      await user.$query().patch(userData).skipValidation();
       request.flash('info', i18next.t('flash.users.edit.success'));
       return reply.redirect('/users');
     } catch (error) {
