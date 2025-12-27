@@ -130,7 +130,7 @@ export default (app) => {
     }
 
     try {
-      await user.$query().patch(updateData);
+      await User.query().findById(id).patch(updateData);
       request.flash('info', i18next.t('flash.users.edit.success'));
       return reply.redirect('/users');
     } catch (error) {
