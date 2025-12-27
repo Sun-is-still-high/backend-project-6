@@ -20,10 +20,10 @@ block content
                     value=email || ''
                     required
                     placeholder=t('views.users.email')
-                    class=errors.email ? 'is-invalid' : ''
+                    class={'is-invalid': errors && errors.email}
                   )
-                  if errors.email
-                    .invalid-feedback= errors.email[0].message
+                  if errors && errors.email
+                    .invalid-feedback.d-block= errors.email[0].message
 
                 .mb-3
                   label.form-label(for="data_password")= t('views.users.password')
