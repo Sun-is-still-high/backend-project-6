@@ -36,17 +36,6 @@ const handleUserUpdate = async (app, request, reply) => {
   }
 
   try {
-    if (patchData.email !== user.email) {
-      const existingUser = await User.query().where('email', patchData.email).first();
-      if (existingUser) {
-        request.flash('error', i18next.t('flash.users.edit.error'));
-        return reply.code(422).render('users/edit.pug', {
-          user: { ...user, ...data },
-          errors: { email: [{ message: 'Email уже занят' }] },
-        });
-      }
-    }
-
     const knex = User.knex();
     const updateData = {
       first_name: patchData.firstName,
@@ -56,11 +45,12 @@ const handleUserUpdate = async (app, request, reply) => {
     if (patchData.passwordDigest) {
       updateData.password_digest = patchData.passwordDigest;
     }
-    await knex('users').where('id', id).update(updateData);
+
+    await knex('users').where('id', Number(id)).update(updateData);
+
     request.flash('info', i18next.t('flash.users.edit.success'));
     return reply.redirect('/users');
   } catch (error) {
-    console.error('User update error:', error);
     request.flash('error', i18next.t('flash.users.edit.error'));
     return reply.code(422).render('users/edit.pug', {
       user: { ...user, ...data },

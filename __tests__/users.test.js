@@ -283,6 +283,53 @@ describe('Users CRUD', () => {
       expect(users[0].email).toBe(newData.email);
     });
 
+    it('should update user via POST with _method=PATCH (browser form simulation)', async () => {
+      const userData = generateUser();
+      const { encrypt } = await import('../server/lib/secure.js');
+
+      const [userId] = await knex('users').insert({
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        email: userData.email,
+        password_digest: encrypt(userData.password),
+      });
+
+      const signInResponse = await server.inject({
+        method: 'POST',
+        url: '/session',
+        payload: {
+          data: {
+            email: userData.email,
+            password: userData.password,
+          },
+        },
+      });
+      const cookies = signInResponse.cookies;
+
+      const newData = {
+        firstName: 'FormUpdatedName',
+        lastName: 'FormUpdatedLast',
+        email: 'form-update@example.com',
+      };
+
+      const response = await server.inject({
+        method: 'POST',
+        url: `/users/${userId}`,
+        cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
+        payload: {
+          _method: 'PATCH',
+          data: newData,
+        },
+      });
+
+      expect(response.statusCode).toBe(302);
+      expect(response.headers.location).toBe('/users');
+
+      const users = await knex('users').select();
+      expect(users[0].first_name).toBe(newData.firstName);
+      expect(users[0].last_name).toBe(newData.lastName);
+      expect(users[0].email).toBe(newData.email);
+    });
   });
 
   describe('User Delete (DELETE /users/:id)', () => {
