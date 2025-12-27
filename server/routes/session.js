@@ -20,6 +20,14 @@ export default (app) => {
 
     const { email, password } = data;
 
+    if (!email || !password) {
+      request.flash('error', i18next.t('flash.session.create.error'));
+      return reply.code(422).render('session/new.pug', {
+        email: email || '',
+        errors: { email: [{ message: i18next.t('flash.session.create.error') }] },
+      });
+    }
+
     const user = await User.query().findOne({ email });
 
     if (!user || user.passwordDigest !== encrypt(password)) {
