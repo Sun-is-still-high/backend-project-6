@@ -129,7 +129,7 @@ export default (app) => {
       userData.passwordDigest = encrypt(data.password);
     }
 
-    await user.$query().patch(userData);
+    await user.$query().patch(userData).skipValidation();
     request.flash('info', i18next.t('flash.users.edit.success'));
     return reply.redirect('/users');
   });
