@@ -13,6 +13,7 @@ block content
 
               form(method="post" action="/session")
                 .mb-3
+                  label.form-label(for="data_email")= t('views.users.email')
                   input#data_email.form-control(
                     type="email"
                     name="data[email]"
@@ -25,6 +26,7 @@ block content
                     .invalid-feedback= errors.email[0].message
 
                 .mb-3
+                  label.form-label(for="data_password")= t('views.users.password')
                   input#data_password.form-control(
                     type="password"
                     name="data[password]"
