@@ -282,6 +282,7 @@ describe('Users CRUD', () => {
       expect(users[0].last_name).toBe(newData.lastName);
       expect(users[0].email).toBe(newData.email);
     });
+
   });
 
   describe('User Delete (DELETE /users/:id)', () => {
