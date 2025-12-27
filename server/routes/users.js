@@ -35,23 +35,20 @@ const handleUserUpdate = async (app, request, reply) => {
     patchData.passwordDigest = encrypt(data.password);
   }
 
-  try {
-    await user.$query().patch({
-      firstName: patchData.firstName,
-      lastName: patchData.lastName,
-      email: patchData.email,
-      ...(patchData.passwordDigest ? { passwordDigest: patchData.passwordDigest } : {}),
-    });
-
-    request.flash('info', i18next.t('flash.users.edit.success'));
-    return reply.redirect('/users');
-  } catch (error) {
-    request.flash('error', i18next.t('flash.users.edit.error'));
-    return reply.code(422).render('users/edit.pug', {
-      user: { ...user, ...data },
-      errors: error.data || {},
-    });
+  const knex = User.knex();
+  const updateData = {
+    first_name: patchData.firstName,
+    last_name: patchData.lastName,
+    email: patchData.email,
+  };
+  if (patchData.passwordDigest) {
+    updateData.password_digest = patchData.passwordDigest;
   }
+
+  await knex('users').where('id', Number(id)).update(updateData);
+
+  request.flash('info', i18next.t('flash.users.edit.success'));
+  return reply.redirect('/users');
 };
 
 const handleUserDelete = async (app, request, reply) => {
