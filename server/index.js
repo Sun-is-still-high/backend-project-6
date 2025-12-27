@@ -68,6 +68,11 @@ const registerPlugins = async (app) => {
   await app.register(fastifyPassport.secureSession());
 
   app.decorateRequest('currentUser', null);
+  app.decorateRequest('flash', function (type, message) {
+    const flash = this.session.get('flash') || {};
+    flash[type] = message;
+    this.session.set('flash', flash);
+  });
   app.addHook('preHandler', async (request) => {
     if (request.user) {
       request.currentUser = request.user;

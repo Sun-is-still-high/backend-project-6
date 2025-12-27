@@ -129,25 +129,18 @@ export default (app) => {
       userData.passwordDigest = encrypt(data.password);
     }
 
-    try {
-      const dbData = {
-        first_name: userData.firstName,
-        last_name: userData.lastName,
-        email: userData.email,
-      };
-      if (userData.passwordDigest) {
-        dbData.password_digest = userData.passwordDigest;
-      }
-      await User.query().findById(id).patch(dbData);
-      request.flash('info', i18next.t('flash.users.edit.success'));
-      return reply.redirect('/users');
-    } catch (error) {
-      request.flash('error', i18next.t('flash.users.edit.error'));
-      return reply.code(422).render('users/edit.pug', {
-        user: { ...user, ...data },
-        errors: error.data || {},
-      });
+    const dbData = {
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      email: userData.email,
+    };
+    if (userData.passwordDigest) {
+      dbData.password_digest = userData.passwordDigest;
     }
+
+    await User.query().findById(id).patch(dbData);
+    request.flash('info', i18next.t('flash.users.edit.success'));
+    return reply.redirect('/users');
   });
 
   app.delete('/users/:id', async (request, reply) => {
