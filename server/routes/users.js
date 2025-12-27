@@ -129,16 +129,7 @@ export default (app) => {
       userData.passwordDigest = encrypt(data.password);
     }
 
-    const dbData = {
-      first_name: userData.firstName,
-      last_name: userData.lastName,
-      email: userData.email,
-    };
-    if (userData.passwordDigest) {
-      dbData.password_digest = userData.passwordDigest;
-    }
-
-    await User.query().findById(id).patch(dbData);
+    await user.$query().patch(userData);
     request.flash('info', i18next.t('flash.users.edit.success'));
     return reply.redirect('/users');
   });
