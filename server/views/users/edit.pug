@@ -10,11 +10,10 @@ block content
         type="text"
         name="data[firstName]"
         value=user.firstName || ''
-        required
-        class=errors.firstName ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.firstName}
       )
-      if errors.firstName
-        .invalid-feedback= errors.firstName[0].message
+      if errors && errors.firstName
+        .invalid-feedback.d-block= errors.firstName[0].message
 
     .mb-3
       label.form-label(for="data_lastName")= t('views.users.lastName')
@@ -22,11 +21,10 @@ block content
         type="text"
         name="data[lastName]"
         value=user.lastName || ''
-        required
-        class=errors.lastName ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.lastName}
       )
-      if errors.lastName
-        .invalid-feedback= errors.lastName[0].message
+      if errors && errors.lastName
+        .invalid-feedback.d-block= errors.lastName[0].message
 
     .mb-3
       label.form-label(for="data_email")= t('views.users.email')
@@ -34,21 +32,20 @@ block content
         type="email"
         name="data[email]"
         value=user.email || ''
-        required
-        class=errors.email ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.email}
       )
-      if errors.email
-        .invalid-feedback= errors.email[0].message
+      if errors && errors.email
+        .invalid-feedback.d-block= errors.email[0].message
 
     .mb-3
       label.form-label(for="data_password")= t('views.users.password')
       input#data_password.form-control(
         type="password"
         name="data[password]"
-        class=errors.password ? 'is-invalid' : ''
+        class={'is-invalid': errors && errors.password}
       )
-      if errors.password
-        .invalid-feedback= errors.password[0].message
+      if errors && errors.password
+        .invalid-feedback.d-block= errors.password[0].message
 
     button.btn.btn-primary.me-2(type="submit")= t('views.users.edit.submit')
 
