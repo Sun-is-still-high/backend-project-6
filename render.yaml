@@ -9,8 +9,8 @@ services:
     name: backend-project-6
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build && npm run db:migrate
-    startCommand: npm start
+    buildCommand: npm install && npm run build
+    startCommand: npm run db:migrate && npm start
     envVars:
       - key: NODE_ENV
         value: production
