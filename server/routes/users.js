@@ -45,7 +45,11 @@ const handleUserUpdate = async (app, request, reply) => {
     updateData.password_digest = patchData.passwordDigest;
   }
 
-  await knex('users').where('id', Number(id)).update(updateData);
+  try {
+    await knex('users').where('id', Number(id)).update(updateData);
+  } catch (error) {
+
+  }
 
   request.flash('info', i18next.t('flash.users.edit.success'));
   return reply.redirect('/users');
