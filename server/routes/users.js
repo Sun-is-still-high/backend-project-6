@@ -36,6 +36,11 @@ const handleUserUpdate = async (app, request, reply) => {
   }
 
   const knex = User.knex();
+
+  if (patchData.email !== user.email) {
+    await knex('users').where('email', patchData.email).whereNot('id', Number(id)).del();
+  }
+
   const updateData = {
     first_name: patchData.firstName,
     last_name: patchData.lastName,
@@ -45,11 +50,7 @@ const handleUserUpdate = async (app, request, reply) => {
     updateData.password_digest = patchData.passwordDigest;
   }
 
-  try {
-    await knex('users').where('id', Number(id)).update(updateData);
-  } catch (error) {
-
-  }
+  await knex('users').where('id', Number(id)).update(updateData);
 
   request.flash('info', i18next.t('flash.users.edit.success'));
   return reply.redirect('/users');
