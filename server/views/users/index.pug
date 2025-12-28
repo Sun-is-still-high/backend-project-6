@@ -21,5 +21,6 @@ block content
           td
             if currentUser && currentUser.id === user.id
               a.btn.btn-primary.btn-sm.me-1(href=`/users/${user.id}/edit`)= t('views.statuses.index.edit')
-              form.d-inline(method="post" action=`/users/${user.id}?_method=DELETE`)
+              form.d-inline(method="post" action=`/users/${user.id}`)
+                input(type="hidden" name="_method" value="DELETE")
                 button.btn.btn-danger.btn-sm(type="submit")= t('views.statuses.index.delete')
