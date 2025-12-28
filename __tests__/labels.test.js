@@ -15,7 +15,7 @@ describe('Labels CRUD', () => {
     return userId;
   };
 
-  const signIn = async (userId) => {
+  const signIn = async () => {
     const response = await server.inject({
       method: 'POST',
       url: '/session',

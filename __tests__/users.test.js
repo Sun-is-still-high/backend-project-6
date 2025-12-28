@@ -257,7 +257,7 @@ describe('Users CRUD', () => {
           },
         },
       });
-      const cookies = signInResponse.cookies;
+      const { cookies } = signInResponse;
 
       const newData = {
         firstName: 'UpdatedFirst',
@@ -304,7 +304,7 @@ describe('Users CRUD', () => {
           },
         },
       });
-      const cookies = signInResponse.cookies;
+      const { cookies } = signInResponse;
 
       const newData = {
         firstName: 'FormUpdatedName',
