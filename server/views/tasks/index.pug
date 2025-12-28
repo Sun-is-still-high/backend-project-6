@@ -61,5 +61,5 @@ block content
           td
             a.btn.btn-sm.btn-warning.me-1(href=`/tasks/${task.id}/edit`)= t('views.tasks.index.edit')
             form.d-inline(method="post" action=`/tasks/${task.id}`)
-              input(type="hidden" name="_method" value="DELETE")
+              input(type="hidden" name="method" value="DELETE")
               button.btn.btn-sm.btn-danger(type="submit")= t('views.tasks.index.delete')

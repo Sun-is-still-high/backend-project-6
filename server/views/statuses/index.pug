@@ -21,5 +21,5 @@ block content
           td
             a.btn.btn-sm.btn-warning(href=`/statuses/${status.id}/edit`)= t('views.statuses.index.edit')
             form.d-inline.ms-2(method="post" action=`/statuses/${status.id}`)
-              input(type="hidden" name="_method" value="DELETE")
+              input(type="hidden" name="method" value="DELETE")
               button.btn.btn-sm.btn-danger(type="submit")= t('views.statuses.index.delete')

@@ -35,7 +35,7 @@ const setupLocalization = async () => {
 };
 
 const setupDatabase = (app, config) => {
-  const knex = Knex(config);
+  const knex = new Knex(config);
   Model.knex(knex);
   app.decorate('knex', knex);
   app.decorate('objection', { knex });
@@ -103,7 +103,7 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
 
   const config = knexConfig[envName] || knexConfig.development;
 
-  const fastify = Fastify({
+  const fastify = new Fastify({
     logger: envName !== 'test',
   });
 

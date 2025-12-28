@@ -50,11 +50,11 @@ export default (app) => {
         : [];
       const labelsMap = new Map(allTaskLabels.map((l) => [l.id, l]));
 
-      tasks.forEach((t) => {
+      tasks.forEach((task, index) => {
         const taskLabelIds = taskLabelRows
-          .filter((r) => r.task_id === t.id)
+          .filter((r) => r.task_id === task.id)
           .map((r) => r.label_id);
-        t.labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
+        tasks[index].labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
       });
     }
 
@@ -339,7 +339,8 @@ export default (app) => {
   });
 
   app.post('/tasks/:id', async (request, reply) => {
-    const method = request.body?._method?.toUpperCase();
+    const { method: methodOverride } = request.body || {};
+    const method = methodOverride?.toUpperCase();
     if (method === 'PATCH') {
       const { id } = request.params;
       const { currentUser } = request;

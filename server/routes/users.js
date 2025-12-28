@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import User from '../models/User.js';
 import Task from '../models/Task.js';
-import { encrypt } from '../lib/secure.js';
+import encrypt from '../lib/secure.js';
 
 const handleUserUpdate = async (app, request, reply) => {
   const { id } = request.params;
@@ -176,7 +176,8 @@ export default (app) => {
   app.patch('/users/:id', async (request, reply) => handleUserUpdate(app, request, reply));
 
   app.post('/users/:id', async (request, reply) => {
-    const method = request.body?._method?.toUpperCase();
+    const body = request.body || {};
+    const method = body.method?.toUpperCase();
     if (method === 'PATCH') {
       return handleUserUpdate(app, request, reply);
     }

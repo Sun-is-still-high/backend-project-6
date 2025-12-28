@@ -283,7 +283,7 @@ describe('Users CRUD', () => {
       expect(users[0].email).toBe(newData.email);
     });
 
-    it('should update user via POST with _method=PATCH (browser form simulation)', async () => {
+    it('should update user via POST with method=PATCH (browser form simulation)', async () => {
       const userData = generateUser();
       const { encrypt } = await import('../server/lib/secure.js');
 
@@ -317,7 +317,7 @@ describe('Users CRUD', () => {
         url: `/users/${userId}`,
         cookies: Object.fromEntries(cookies.map((c) => [c.name, c.value])),
         payload: {
-          _method: 'PATCH',
+          method: 'PATCH',
           data: newData,
         },
       });

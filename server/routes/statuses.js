@@ -171,7 +171,8 @@ export default (app) => {
   app.patch('/statuses/:id', async (request, reply) => handleStatusUpdate(request, reply));
 
   app.post('/statuses/:id', async (request, reply) => {
-    const method = request.body?._method?.toUpperCase();
+    const { method: methodOverride } = request.body || {};
+    const method = methodOverride?.toUpperCase();
     if (method === 'PATCH') {
       return handleStatusUpdate(request, reply);
     }

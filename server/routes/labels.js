@@ -171,7 +171,8 @@ export default (app) => {
   app.patch('/labels/:id', async (request, reply) => handleLabelUpdate(request, reply));
 
   app.post('/labels/:id', async (request, reply) => {
-    const method = request.body?._method?.toUpperCase();
+    const { method: methodOverride } = request.body || {};
+    const method = methodOverride?.toUpperCase();
     if (method === 'PATCH') {
       return handleLabelUpdate(request, reply);
     }
