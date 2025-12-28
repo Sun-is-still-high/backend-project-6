@@ -15,7 +15,7 @@ export default (app) => {
 
     const { status, executor, label, isCreatorUser } = request.query;
 
-    let query = Task.query().withGraphFetched('[status, creator, executor, labels]');
+    let query = Task.query().withGraphFetched('[status, creator, executor]');
 
     if (status) {
       query = query.where('status_id', status);
@@ -36,6 +36,26 @@ export default (app) => {
     }
 
     const tasks = await query;
+
+    // Load labels for each task manually
+    const knex = Task.knex();
+    const taskIds = tasks.map((t) => t.id);
+    if (taskIds.length > 0) {
+      const taskLabelRows = await knex('tasks_labels').whereIn('task_id', taskIds);
+      const labelIdsSet = [...new Set(taskLabelRows.map((r) => r.label_id))];
+      const allTaskLabels = labelIdsSet.length > 0
+        ? await Label.query().whereIn('id', labelIdsSet)
+        : [];
+      const labelsMap = new Map(allTaskLabels.map((l) => [l.id, l]));
+
+      tasks.forEach((task) => {
+        const taskLabelIds = taskLabelRows
+          .filter((r) => r.task_id === task.id)
+          .map((r) => r.label_id);
+        task.labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
+      });
+    }
+
     const statuses = await TaskStatus.query();
     const users = await User.query();
     const labels = await Label.query();
@@ -165,11 +185,20 @@ export default (app) => {
 
     const task = await Task.query()
       .findById(id)
-      .withGraphFetched('[status, creator, executor, labels]');
+      .withGraphFetched('[status, creator, executor]');
 
     if (!task) {
       request.flash('error', i18next.t('flash.tasks.show.notFound'));
       return reply.redirect('/tasks');
+    }
+
+    // Load labels manually via join table
+    const knex = Task.knex();
+    const labelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+    if (labelIds.length > 0) {
+      task.labels = await Label.query().whereIn('id', labelIds);
+    } else {
+      task.labels = [];
     }
 
     return reply.render('tasks/show.pug', { task });
@@ -184,13 +213,16 @@ export default (app) => {
       return reply.redirect('/session/new');
     }
 
-    const task = await Task.query()
-      .findById(id)
-      .withGraphFetched('labels');
+    const task = await Task.query().findById(id);
     if (!task) {
       request.flash('error', i18next.t('flash.tasks.edit.notFound'));
       return reply.redirect('/tasks');
     }
+
+    // Load labels manually
+    const knex = Task.knex();
+    const labelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+    task.labels = labelIds.length > 0 ? await Label.query().whereIn('id', labelIds) : [];
 
     const statuses = await TaskStatus.query();
     const users = await User.query();
@@ -217,7 +249,10 @@ export default (app) => {
 
     if (!data) {
       request.flash('error', i18next.t('flash.tasks.edit.error'));
-      const taskWithLabels = await Task.query().findById(id).withGraphFetched('labels');
+      const taskWithLabels = await Task.query().findById(id);
+      const knex = Task.knex();
+      const taskLabelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+      taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
       const statuses = await TaskStatus.query();
       const users = await User.query();
       const labels = await Label.query();
@@ -316,7 +351,10 @@ export default (app) => {
 
       if (!data) {
         request.flash('error', i18next.t('flash.tasks.edit.error'));
-        const taskWithLabels = await Task.query().findById(id).withGraphFetched('labels');
+        const taskWithLabels = await Task.query().findById(id);
+        const knex = Task.knex();
+        const taskLabelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+        taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
         const statuses = await TaskStatus.query();
         const users = await User.query();
         const labels = await Label.query();
