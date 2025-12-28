@@ -67,14 +67,14 @@ const registerPlugins = async (app) => {
   await app.register(fastifyPassport.secureSession());
 
   app.decorateRequest('currentUser', null);
-  app.addHook('preHandler', async (request) => {
-    if (request.user) {
-      request.currentUser = request.user;
+  app.addHook('preHandler', async (req) => {
+    if (req.user) {
+      req.currentUser = req.user;
     }
-    request.flash = (type, message) => {
-      const flash = request.session.get('flash') || {};
+    req.flash = (type, message) => {
+      const flash = req.session.get('flash') || {};
       flash[type] = message;
-      request.session.set('flash', flash);
+      req.session.set('flash', flash);
     };
   });
 
@@ -106,7 +106,6 @@ const app = async (envName = process.env.NODE_ENV || 'development') => {
   const fastify = Fastify({
     logger: envName !== 'test',
   });
-
 
   setupDatabase(fastify, config);
   await registerPlugins(fastify);

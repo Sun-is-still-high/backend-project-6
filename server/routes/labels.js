@@ -3,7 +3,7 @@ import Label from '../models/Label.js';
 
 const handleLabelUpdate = async (request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -55,7 +55,7 @@ const handleLabelUpdate = async (request, reply) => {
 
 const handleLabelDelete = async (request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -69,7 +69,7 @@ const handleLabelDelete = async (request, reply) => {
   }
 
   const knex = Label.knex();
-  const tasksCount = await knex('tasks_labels').where('label_id', id).count('* as count').first();
+  const tasksCount = knex('tasks_labels').where('label_id', id).count('* as count').first();
   if (tasksCount.count > 0) {
     request.flash('error', i18next.t('flash.labels.delete.hasTasks'));
     return reply.redirect('/labels');
@@ -82,7 +82,7 @@ const handleLabelDelete = async (request, reply) => {
 
 export default (app) => {
   app.get('/labels', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -94,7 +94,7 @@ export default (app) => {
   });
 
   app.get('/labels/new', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -106,7 +106,7 @@ export default (app) => {
   });
 
   app.post('/labels', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -152,7 +152,7 @@ export default (app) => {
 
   app.get('/labels/:id/edit', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -168,9 +168,7 @@ export default (app) => {
     return reply.render('labels/edit.pug', { label, errors: {} });
   });
 
-  app.patch('/labels/:id', async (request, reply) => {
-    return handleLabelUpdate(request, reply);
-  });
+  app.patch('/labels/:id', async (request, reply) => handleLabelUpdate(request, reply));
 
   app.post('/labels/:id', async (request, reply) => {
     const method = request.body?._method?.toUpperCase();
@@ -183,7 +181,5 @@ export default (app) => {
     return reply.code(405).send({ error: 'Method not allowed' });
   });
 
-  app.delete('/labels/:id', async (request, reply) => {
-    return handleLabelDelete(request, reply);
-  });
+  app.delete('/labels/:id', async (request, reply) => handleLabelDelete(request, reply));
 };

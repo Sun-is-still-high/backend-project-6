@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm test:*)",
+      "Bash(node -e:*)",
+      "Bash(npm install:*)",
+      "Bash(npx playwright install:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npm link)",
+      "Bash(npm link:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx eslint@8:*)"
+    ]
+  }
+}

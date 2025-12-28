@@ -6,14 +6,16 @@ import Label from '../models/Label.js';
 
 export default (app) => {
   app.get('/tasks', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
       return reply.redirect('/session/new');
     }
 
-    const { status, executor, label, isCreatorUser } = request.query;
+    const {
+      status, executor, label, isCreatorUser,
+    } = request.query;
 
     let query = Task.query().withGraphFetched('[status, creator, executor]');
 
@@ -48,11 +50,11 @@ export default (app) => {
         : [];
       const labelsMap = new Map(allTaskLabels.map((l) => [l.id, l]));
 
-      tasks.forEach((task) => {
+      tasks.forEach((t) => {
         const taskLabelIds = taskLabelRows
-          .filter((r) => r.task_id === task.id)
+          .filter((r) => r.task_id === t.id)
           .map((r) => r.label_id);
-        task.labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
+        t.labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
       });
     }
 
@@ -67,11 +69,13 @@ export default (app) => {
       isCreatorUser: !!isCreatorUser,
     };
 
-    return reply.render('tasks/index.pug', { tasks, statuses, users, labels, filter });
+    return reply.render('tasks/index.pug', {
+      tasks, statuses, users, labels, filter,
+    });
   });
 
   app.get('/tasks/new', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -82,11 +86,13 @@ export default (app) => {
     const statuses = await TaskStatus.query();
     const users = await User.query();
     const labels = await Label.query();
-    return reply.render('tasks/new.pug', { task, statuses, users, labels, errors: {} });
+    return reply.render('tasks/new.pug', {
+      task, statuses, users, labels, errors: {},
+    });
   });
 
   app.post('/tasks', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -174,7 +180,7 @@ export default (app) => {
   });
 
   app.get('/tasks/:id', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -206,7 +212,7 @@ export default (app) => {
 
   app.get('/tasks/:id/edit', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -227,12 +233,14 @@ export default (app) => {
     const statuses = await TaskStatus.query();
     const users = await User.query();
     const labels = await Label.query();
-    return reply.render('tasks/edit.pug', { task, statuses, users, labels, errors: {} });
+    return reply.render('tasks/edit.pug', {
+      task, statuses, users, labels, errors: {},
+    });
   });
 
   app.patch('/tasks/:id', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -334,7 +342,7 @@ export default (app) => {
     const method = request.body?._method?.toUpperCase();
     if (method === 'PATCH') {
       const { id } = request.params;
-      const currentUser = request.currentUser;
+      const { currentUser } = request;
 
       if (!currentUser) {
         request.flash('error', i18next.t('flash.authError'));
@@ -432,7 +440,7 @@ export default (app) => {
     }
     if (method === 'DELETE') {
       const { id } = request.params;
-      const currentUser = request.currentUser;
+      const { currentUser } = request;
 
       if (!currentUser) {
         request.flash('error', i18next.t('flash.authError'));
@@ -459,7 +467,7 @@ export default (app) => {
 
   app.delete('/tasks/:id', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));

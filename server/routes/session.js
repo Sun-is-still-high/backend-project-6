@@ -3,9 +3,7 @@ import User from '../models/User.js';
 import { encrypt } from '../lib/secure.js';
 
 export default (app) => {
-  app.get('/session/new', async (request, reply) => {
-    return reply.render('session/new.pug', { errors: {} });
-  });
+  app.get('/session/new', async (request, reply) => reply.render('session/new.pug', { errors: {} }));
 
   app.post('/session', async (request, reply) => {
     const { data } = request.body;

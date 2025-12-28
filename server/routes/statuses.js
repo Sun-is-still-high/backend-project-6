@@ -4,7 +4,7 @@ import Task from '../models/Task.js';
 
 const handleStatusUpdate = async (request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -56,7 +56,7 @@ const handleStatusUpdate = async (request, reply) => {
 
 const handleStatusDelete = async (request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -82,7 +82,7 @@ const handleStatusDelete = async (request, reply) => {
 
 export default (app) => {
   app.get('/statuses', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -94,7 +94,7 @@ export default (app) => {
   });
 
   app.get('/statuses/new', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -106,7 +106,7 @@ export default (app) => {
   });
 
   app.post('/statuses', async (request, reply) => {
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -152,7 +152,7 @@ export default (app) => {
 
   app.get('/statuses/:id/edit', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -168,9 +168,7 @@ export default (app) => {
     return reply.render('statuses/edit.pug', { status, errors: {} });
   });
 
-  app.patch('/statuses/:id', async (request, reply) => {
-    return handleStatusUpdate(request, reply);
-  });
+  app.patch('/statuses/:id', async (request, reply) => handleStatusUpdate(request, reply));
 
   app.post('/statuses/:id', async (request, reply) => {
     const method = request.body?._method?.toUpperCase();
@@ -183,7 +181,5 @@ export default (app) => {
     return reply.code(405).send({ error: 'Method not allowed' });
   });
 
-  app.delete('/statuses/:id', async (request, reply) => {
-    return handleStatusDelete(request, reply);
-  });
+  app.delete('/statuses/:id', async (request, reply) => handleStatusDelete(request, reply));
 };

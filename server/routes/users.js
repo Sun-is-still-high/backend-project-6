@@ -5,7 +5,7 @@ import { encrypt } from '../lib/secure.js';
 
 const handleUserUpdate = async (app, request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -58,7 +58,7 @@ const handleUserUpdate = async (app, request, reply) => {
 
 const handleUserDelete = async (app, request, reply) => {
   const { id } = request.params;
-  const currentUser = request.currentUser;
+  const { currentUser } = request;
 
   if (!currentUser) {
     request.flash('error', i18next.t('flash.authError'));
@@ -152,7 +152,7 @@ export default (app) => {
 
   app.get('/users/:id/edit', async (request, reply) => {
     const { id } = request.params;
-    const currentUser = request.currentUser;
+    const { currentUser } = request;
 
     if (!currentUser) {
       request.flash('error', i18next.t('flash.authError'));
@@ -173,9 +173,7 @@ export default (app) => {
     return reply.render('users/edit.pug', { user, errors: {} });
   });
 
-  app.patch('/users/:id', async (request, reply) => {
-    return handleUserUpdate(app, request, reply);
-  });
+  app.patch('/users/:id', async (request, reply) => handleUserUpdate(app, request, reply));
 
   app.post('/users/:id', async (request, reply) => {
     const method = request.body?._method?.toUpperCase();
@@ -188,7 +186,5 @@ export default (app) => {
     return reply.code(405).send({ error: 'Method not allowed' });
   });
 
-  app.delete('/users/:id', async (request, reply) => {
-    return handleUserDelete(app, request, reply);
-  });
+  app.delete('/users/:id', async (request, reply) => handleUserDelete(app, request, reply));
 };
