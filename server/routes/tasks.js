@@ -200,7 +200,8 @@ export default (app) => {
 
     // Load labels manually via join table
     const knex = Task.knex();
-    const labelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
+    const labelRows = await knex('tasksLabels').where('taskId', id).select('labelId');
+    const labelIds = labelRows.map((r) => r.labelId);
     if (labelIds.length > 0) {
       task.labels = await Label.query().whereIn('id', labelIds);
     } else {
@@ -227,7 +228,8 @@ export default (app) => {
 
     // Load labels manually
     const knex = Task.knex();
-    const labelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
+    const labelRows = await knex('tasksLabels').where('taskId', id).select('labelId');
+    const labelIds = labelRows.map((r) => r.labelId);
     task.labels = labelIds.length > 0 ? await Label.query().whereIn('id', labelIds) : [];
 
     const statuses = await TaskStatus.query();
@@ -259,7 +261,8 @@ export default (app) => {
       request.flash('error', i18next.t('flash.tasks.edit.error'));
       const taskWithLabels = await Task.query().findById(id);
       const knex = Task.knex();
-      const taskLabelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
+      const taskLabelRows = await knex('tasksLabels').where('taskId', id).select('labelId');
+      const taskLabelIds = taskLabelRows.map((r) => r.labelId);
       taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
       const statuses = await TaskStatus.query();
       const users = await User.query();
@@ -362,7 +365,8 @@ export default (app) => {
         request.flash('error', i18next.t('flash.tasks.edit.error'));
         const taskWithLabels = await Task.query().findById(id);
         const knex = Task.knex();
-        const taskLabelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
+        const taskLabelRows = await knex('tasksLabels').where('taskId', id).select('labelId');
+        const taskLabelIds = taskLabelRows.map((r) => r.labelId);
         taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
         const statuses = await TaskStatus.query();
         const users = await User.query();
