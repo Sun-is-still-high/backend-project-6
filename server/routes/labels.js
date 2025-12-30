@@ -69,7 +69,7 @@ const handleLabelDelete = async (request, reply) => {
   }
 
   const knex = Label.knex();
-  const tasksCount = knex('tasks_labels').where('label_id', id).count('* as count').first();
+  const tasksCount = await knex('tasksLabels').where('labelId', id).count('* as count').first();
   if (tasksCount.count > 0) {
     request.flash('error', i18next.t('flash.labels.delete.hasTasks'));
     return reply.redirect('/labels');

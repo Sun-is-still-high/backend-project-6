@@ -15,26 +15,6 @@ class TaskStatus extends Model {
       },
     };
   }
-
-  $formatDatabaseJson(json) {
-    const dbJson = super.$formatDatabaseJson(json);
-    const result = {};
-
-    if (dbJson.name !== undefined) result.name = dbJson.name;
-    if (dbJson.id !== undefined) result.id = dbJson.id;
-
-    return result;
-  }
-
-  $parseDatabaseJson(json) {
-    const parsed = super.$parseDatabaseJson(json);
-    return {
-      id: parsed.id,
-      name: parsed.name,
-      createdAt: parsed.created_at,
-      updatedAt: parsed.updated_at,
-    };
-  }
 }
 
 export default TaskStatus;

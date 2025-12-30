@@ -29,7 +29,7 @@ class Task extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: TaskStatus,
         join: {
-          from: 'tasks.status_id',
+          from: 'tasks.statusId',
           to: 'task_statuses.id',
         },
       },
@@ -37,7 +37,7 @@ class Task extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'tasks.creator_id',
+          from: 'tasks.creatorId',
           to: 'users.id',
         },
       },
@@ -45,7 +45,7 @@ class Task extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: User,
         join: {
-          from: 'tasks.executor_id',
+          from: 'tasks.executorId',
           to: 'users.id',
         },
       },
@@ -55,43 +55,12 @@ class Task extends Model {
         join: {
           from: 'tasks.id',
           through: {
-            from: 'tasks_labels.task_id',
-            to: 'tasks_labels.label_id',
+            from: 'tasks_labels.taskId',
+            to: 'tasks_labels.labelId',
           },
           to: 'labels.id',
         },
       },
-    };
-  }
-
-  $formatDatabaseJson(json) {
-    const dbJson = super.$formatDatabaseJson(json);
-    const result = {};
-
-    if (dbJson.name !== undefined) result.name = dbJson.name;
-    if (dbJson.description !== undefined) result.description = dbJson.description;
-    if (dbJson.statusId !== undefined) result.status_id = dbJson.statusId;
-    if (dbJson.creatorId !== undefined) result.creator_id = dbJson.creatorId;
-    if (dbJson.executorId !== undefined) result.executor_id = dbJson.executorId;
-    if (dbJson.id !== undefined) result.id = dbJson.id;
-
-    return result;
-  }
-
-  $parseDatabaseJson(json) {
-    const parsed = super.$parseDatabaseJson(json);
-    return {
-      id: parsed.id,
-      name: parsed.name,
-      description: parsed.description,
-      statusId: parsed.status_id,
-      creatorId: parsed.creator_id,
-      executorId: parsed.executor_id,
-      createdAt: parsed.created_at,
-      updatedAt: parsed.updated_at,
-      status_id: parsed.status_id,
-      creator_id: parsed.creator_id,
-      executor_id: parsed.executor_id,
     };
   }
 }

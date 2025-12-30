@@ -20,11 +20,11 @@ export default (app) => {
     let query = Task.query().withGraphFetched('[status, creator, executor]');
 
     if (status) {
-      query = query.where('status_id', status);
+      query = query.where('statusId', status);
     }
 
     if (executor) {
-      query = query.where('executor_id', executor);
+      query = query.where('executorId', executor);
     }
 
     if (label) {
@@ -34,7 +34,7 @@ export default (app) => {
     }
 
     if (isCreatorUser && currentUser) {
-      query = query.where('creator_id', currentUser.id);
+      query = query.where('creatorId', currentUser.id);
     }
 
     const tasks = await query;
@@ -43,8 +43,8 @@ export default (app) => {
     const knex = Task.knex();
     const taskIds = tasks.map((t) => t.id);
     if (taskIds.length > 0) {
-      const taskLabelRows = await knex('tasks_labels').whereIn('task_id', taskIds);
-      const labelIdsSet = [...new Set(taskLabelRows.map((r) => r.label_id))];
+      const taskLabelRows = await knex('tasksLabels').whereIn('taskId', taskIds);
+      const labelIdsSet = [...new Set(taskLabelRows.map((r) => r.labelId))];
       const allTaskLabels = labelIdsSet.length > 0
         ? await Label.query().whereIn('id', labelIdsSet)
         : [];
@@ -52,8 +52,8 @@ export default (app) => {
 
       tasks.forEach((task, index) => {
         const taskLabelIds = taskLabelRows
-          .filter((r) => r.task_id === task.id)
-          .map((r) => r.label_id);
+          .filter((r) => r.taskId === task.id)
+          .map((r) => r.labelId);
         tasks[index].labels = taskLabelIds.map((lid) => labelsMap.get(lid)).filter(Boolean);
       });
     }
@@ -156,10 +156,10 @@ export default (app) => {
 
       if (labelIds.length > 0) {
         const labelRows = labelIds.map((labelId) => ({
-          task_id: newTask.id,
-          label_id: labelId,
+          taskId: newTask.id,
+          labelId,
         }));
-        await knex('tasks_labels').insert(labelRows);
+        await knex('tasksLabels').insert(labelRows);
       }
 
       request.flash('info', i18next.t('flash.tasks.create.success'));
@@ -200,7 +200,7 @@ export default (app) => {
 
     // Load labels manually via join table
     const knex = Task.knex();
-    const labelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+    const labelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
     if (labelIds.length > 0) {
       task.labels = await Label.query().whereIn('id', labelIds);
     } else {
@@ -227,7 +227,7 @@ export default (app) => {
 
     // Load labels manually
     const knex = Task.knex();
-    const labelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+    const labelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
     task.labels = labelIds.length > 0 ? await Label.query().whereIn('id', labelIds) : [];
 
     const statuses = await TaskStatus.query();
@@ -259,7 +259,7 @@ export default (app) => {
       request.flash('error', i18next.t('flash.tasks.edit.error'));
       const taskWithLabels = await Task.query().findById(id);
       const knex = Task.knex();
-      const taskLabelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+      const taskLabelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
       taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
       const statuses = await TaskStatus.query();
       const users = await User.query();
@@ -312,13 +312,13 @@ export default (app) => {
       await task.$query().patch(taskData);
 
       // Update labels: delete old and insert new
-      await knex('tasks_labels').where('task_id', id).delete();
+      await knex('tasksLabels').where('taskId', id).delete();
       if (labelIds.length > 0) {
         const labelRows = labelIds.map((labelId) => ({
-          task_id: Number(id),
-          label_id: labelId,
+          taskId: Number(id),
+          labelId,
         }));
-        await knex('tasks_labels').insert(labelRows);
+        await knex('tasksLabels').insert(labelRows);
       }
 
       request.flash('info', i18next.t('flash.tasks.edit.success'));
@@ -362,7 +362,7 @@ export default (app) => {
         request.flash('error', i18next.t('flash.tasks.edit.error'));
         const taskWithLabels = await Task.query().findById(id);
         const knex = Task.knex();
-        const taskLabelIds = await knex('tasks_labels').where('task_id', id).pluck('label_id');
+        const taskLabelIds = await knex('tasksLabels').where('taskId', id).pluck('labelId');
         taskWithLabels.labels = taskLabelIds.length > 0 ? await Label.query().whereIn('id', taskLabelIds) : [];
         const statuses = await TaskStatus.query();
         const users = await User.query();
@@ -414,13 +414,13 @@ export default (app) => {
         const knex = Task.knex();
         await task.$query().patch(taskData);
 
-        await knex('tasks_labels').where('task_id', id).delete();
+        await knex('tasksLabels').where('taskId', id).delete();
         if (labelIds.length > 0) {
           const labelRows = labelIds.map((labelId) => ({
-            task_id: Number(id),
-            label_id: labelId,
+            taskId: Number(id),
+            labelId,
           }));
-          await knex('tasks_labels').insert(labelRows);
+          await knex('tasksLabels').insert(labelRows);
         }
 
         request.flash('info', i18next.t('flash.tasks.edit.success'));

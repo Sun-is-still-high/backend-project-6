@@ -64,16 +64,20 @@ const registerPlugins = async (app) => {
   await app.register(fastifyPassport.initialize());
   await app.register(fastifyPassport.secureSession());
 
-  app.decorateRequest('currentUser', null);
+  if (!app.hasRequestDecorator('currentUser')) {
+    app.decorateRequest('currentUser', null);
+  }
+  if (!app.hasRequestDecorator('flash')) {
+    app.decorateRequest('flash', function (type, message) {
+      const flash = this.session.get('flash') || {};
+      flash[type] = message;
+      this.session.set('flash', flash);
+    });
+  }
   app.addHook('preHandler', async (req) => {
     if (req.user) {
       req.currentUser = req.user;
     }
-    req.flash = (type, message) => {
-      const flash = req.session.get('flash') || {};
-      flash[type] = message;
-      req.session.set('flash', flash);
-    };
   });
 
   await app.register(view, {

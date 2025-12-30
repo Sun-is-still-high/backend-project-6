@@ -1,5 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { knexSnakeCaseMappers } from 'objection';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -14,6 +15,7 @@ export const development = {
   },
   useNullAsDefault: true,
   migrations,
+  ...knexSnakeCaseMappers(),
 };
 
 export const test = {
@@ -21,12 +23,14 @@ export const test = {
   connection: ':memory:',
   useNullAsDefault: true,
   migrations,
+  ...knexSnakeCaseMappers(),
 };
 
 export const production = {
   client: 'pg',
   connection: process.env.DATABASE_URL,
   migrations,
+  ...knexSnakeCaseMappers(),
 };
 
 export default { development, test, production };
