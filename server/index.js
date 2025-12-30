@@ -19,6 +19,7 @@ import en from './locales/en.js';
 import ru from './locales/ru.js';
 import addRoutes from './routes/index.js';
 import * as knexConfig from '../knexfile.js';
+import User from './models/User.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,10 +59,7 @@ const registerPlugins = async (app) => {
   });
 
   fastifyPassport.registerUserSerializer(async (user) => user.id);
-  fastifyPassport.registerUserDeserializer(async (userId) => {
-    const { default: models } = await import('./models/index.js');
-    return models.User.query().findById(userId);
-  });
+  fastifyPassport.registerUserDeserializer(async (userId) => User.query().findById(userId));
 
   await app.register(fastifyPassport.initialize());
   await app.register(fastifyPassport.secureSession());
