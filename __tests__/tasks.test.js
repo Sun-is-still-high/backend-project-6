@@ -1,22 +1,22 @@
 import app from '../server/index.js';
+import encrypt from '../server/lib/secure.js';
 
 describe('Tasks CRUD', () => {
   let server;
   let knex;
 
   const createUser = async (email = 'test@example.com') => {
-    const { encrypt } = await import('../server/lib/secure.js');
     const [userId] = await knex('users').insert({
-      first_name: 'Test',
-      last_name: 'User',
+      firstName: 'Test',
+      lastName: 'User',
       email,
-      password_digest: encrypt('password'),
+      passwordDigest: encrypt('password'),
     });
     return userId;
   };
 
   const createStatus = async (name = 'Новый') => {
-    const [statusId] = await knex('task_statuses').insert({ name });
+    const [statusId] = await knex('taskStatuses').insert({ name });
     return statusId;
   };
 
@@ -41,10 +41,10 @@ describe('Tasks CRUD', () => {
   });
 
   beforeEach(async () => {
-    await knex('tasks_labels').truncate();
+    await knex('tasksLabels').truncate();
     await knex('tasks').truncate();
     await knex('labels').truncate();
-    await knex('task_statuses').truncate();
+    await knex('taskStatuses').truncate();
     await knex('users').truncate();
   });
 
@@ -85,8 +85,8 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -175,7 +175,7 @@ describe('Tasks CRUD', () => {
       expect(tasks).toHaveLength(1);
       expect(tasks[0].name).toBe('Новая задача');
       expect(tasks[0].description).toBe('Описание задачи');
-      expect(tasks[0].creator_id).toBe(userId);
+      expect(tasks[0].creatorId).toBe(userId);
     });
 
     it('should not create task with empty name', async () => {
@@ -225,8 +225,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -246,8 +246,8 @@ describe('Tasks CRUD', () => {
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
         description: 'Описание',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -283,8 +283,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -303,8 +303,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -326,8 +326,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -352,8 +352,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -380,8 +380,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -403,8 +403,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -427,8 +427,8 @@ describe('Tasks CRUD', () => {
 
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: creatorId,
+        statusId,
+        creatorId,
       });
 
       const cookies = await signIn('other@example.com');
@@ -455,8 +455,8 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -479,8 +479,8 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -492,7 +492,7 @@ describe('Tasks CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/statuses');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(1);
     });
   });
@@ -506,13 +506,13 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Задача 1',
-        status_id: status1Id,
-        creator_id: userId,
+        statusId: status1Id,
+        creatorId: userId,
       });
       await knex('tasks').insert({
         name: 'Задача 2',
-        status_id: status2Id,
-        creator_id: userId,
+        statusId: status2Id,
+        creatorId: userId,
       });
 
       const response = await server.inject({
@@ -535,15 +535,15 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Задача исполнителя 1',
-        status_id: statusId,
-        creator_id: creatorId,
-        executor_id: executor1Id,
+        statusId,
+        creatorId,
+        executorId: executor1Id,
       });
       await knex('tasks').insert({
         name: 'Задача исполнителя 2',
-        status_id: statusId,
-        creator_id: creatorId,
-        executor_id: executor2Id,
+        statusId,
+        creatorId,
+        executorId: executor2Id,
       });
 
       const response = await server.inject({
@@ -567,17 +567,17 @@ describe('Tasks CRUD', () => {
 
       const [task1Id] = await knex('tasks').insert({
         name: 'Задача с меткой 1',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
       const [task2Id] = await knex('tasks').insert({
         name: 'Задача с меткой 2',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
 
-      await knex('tasks_labels').insert({ task_id: task1Id, label_id: label1Id });
-      await knex('tasks_labels').insert({ task_id: task2Id, label_id: label2Id });
+      await knex('tasksLabels').insert({ taskId: task1Id, labelId: label1Id });
+      await knex('tasksLabels').insert({ taskId: task2Id, labelId: label2Id });
 
       const response = await server.inject({
         method: 'GET',
@@ -598,13 +598,13 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Задача пользователя 1',
-        status_id: statusId,
-        creator_id: user1Id,
+        statusId,
+        creatorId: user1Id,
       });
       await knex('tasks').insert({
         name: 'Задача пользователя 2',
-        status_id: statusId,
-        creator_id: user2Id,
+        statusId,
+        creatorId: user2Id,
       });
 
       const response = await server.inject({
@@ -627,18 +627,18 @@ describe('Tasks CRUD', () => {
 
       await knex('tasks').insert({
         name: 'Задача 1 - Новый статус, пользователь 1',
-        status_id: status1Id,
-        creator_id: user1Id,
+        statusId: status1Id,
+        creatorId: user1Id,
       });
       await knex('tasks').insert({
         name: 'Задача 2 - В работе, пользователь 1',
-        status_id: status2Id,
-        creator_id: user1Id,
+        statusId: status2Id,
+        creatorId: user1Id,
       });
       await knex('tasks').insert({
         name: 'Задача 3 - Новый статус, пользователь 2',
-        status_id: status1Id,
-        creator_id: user2Id,
+        statusId: status1Id,
+        creatorId: user2Id,
       });
 
       const response = await server.inject({

@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import app from '../server/index.js';
+import encrypt from '../server/lib/secure.js';
 
 describe('Users CRUD', () => {
   let server;
@@ -40,13 +41,12 @@ describe('Users CRUD', () => {
 
     it('should show all registered users', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({
@@ -95,8 +95,8 @@ describe('Users CRUD', () => {
       const users = await knex('users').select();
       expect(users).toHaveLength(1);
       expect(users[0].email).toBe(userData.email);
-      expect(users[0].first_name).toBe(userData.firstName);
-      expect(users[0].last_name).toBe(userData.lastName);
+      expect(users[0].firstName).toBe(userData.firstName);
+      expect(users[0].lastName).toBe(userData.lastName);
     });
 
     it('should not create user with invalid data', async () => {
@@ -121,13 +121,12 @@ describe('Users CRUD', () => {
 
     it('should not create user with duplicate email', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({
@@ -165,13 +164,12 @@ describe('Users CRUD', () => {
 
     it('POST /session should authenticate user with valid credentials', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({
@@ -191,13 +189,12 @@ describe('Users CRUD', () => {
 
     it('POST /session should reject invalid credentials', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({
@@ -218,13 +215,12 @@ describe('Users CRUD', () => {
   describe('User Edit/Update (PATCH /users/:id)', () => {
     it('should not allow unauthenticated users to edit', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       const [userId] = await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({
@@ -238,13 +234,12 @@ describe('Users CRUD', () => {
 
     it('should update user for authenticated user', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       const [userId] = await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const signInResponse = await server.inject({
@@ -278,20 +273,19 @@ describe('Users CRUD', () => {
       expect(response.headers.location).toBe('/users');
 
       const users = await knex('users').select();
-      expect(users[0].first_name).toBe(newData.firstName);
-      expect(users[0].last_name).toBe(newData.lastName);
+      expect(users[0].firstName).toBe(newData.firstName);
+      expect(users[0].lastName).toBe(newData.lastName);
       expect(users[0].email).toBe(newData.email);
     });
 
     it('should update user via POST with method=PATCH (browser form simulation)', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       const [userId] = await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const signInResponse = await server.inject({
@@ -326,8 +320,8 @@ describe('Users CRUD', () => {
       expect(response.headers.location).toBe('/users');
 
       const users = await knex('users').select();
-      expect(users[0].first_name).toBe(newData.firstName);
-      expect(users[0].last_name).toBe(newData.lastName);
+      expect(users[0].firstName).toBe(newData.firstName);
+      expect(users[0].lastName).toBe(newData.lastName);
       expect(users[0].email).toBe(newData.email);
     });
   });
@@ -335,13 +329,12 @@ describe('Users CRUD', () => {
   describe('User Delete (DELETE /users/:id)', () => {
     it('should not allow unauthenticated users to delete', async () => {
       const userData = generateUser();
-      const { encrypt } = await import('../server/lib/secure.js');
 
       const [userId] = await knex('users').insert({
-        first_name: userData.firstName,
-        last_name: userData.lastName,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
-        password_digest: encrypt(userData.password),
+        passwordDigest: encrypt(userData.password),
       });
 
       const response = await server.inject({

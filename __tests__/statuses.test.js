@@ -1,16 +1,16 @@
 import app from '../server/index.js';
+import encrypt from '../server/lib/secure.js';
 
 describe('Statuses CRUD', () => {
   let server;
   let knex;
 
   const createUser = async () => {
-    const { encrypt } = await import('../server/lib/secure.js');
     const [userId] = await knex('users').insert({
-      first_name: 'Test',
-      last_name: 'User',
+      firstName: 'Test',
+      lastName: 'User',
       email: 'test@example.com',
-      password_digest: encrypt('password'),
+      passwordDigest: encrypt('password'),
     });
     return userId;
   };
@@ -36,7 +36,7 @@ describe('Statuses CRUD', () => {
   });
 
   beforeEach(async () => {
-    await knex('task_statuses').truncate();
+    await knex('taskStatuses').truncate();
     await knex('users').truncate();
   });
 
@@ -73,8 +73,8 @@ describe('Statuses CRUD', () => {
     it('should show all statuses', async () => {
       await createUser();
       const cookies = await signIn();
-      await knex('task_statuses').insert({ name: 'Новый' });
-      await knex('task_statuses').insert({ name: 'В работе' });
+      await knex('taskStatuses').insert({ name: 'Новый' });
+      await knex('taskStatuses').insert({ name: 'В работе' });
 
       const response = await server.inject({
         method: 'GET',
@@ -128,7 +128,7 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/session/new');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(0);
     });
 
@@ -148,7 +148,7 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/statuses');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(1);
       expect(statuses[0].name).toBe('Новый');
     });
@@ -168,14 +168,14 @@ describe('Statuses CRUD', () => {
 
       expect(response.statusCode).toBe(422);
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(0);
     });
   });
 
   describe('GET /statuses/:id/edit', () => {
     it('should redirect unauthenticated users to login', async () => {
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'GET',
@@ -189,7 +189,7 @@ describe('Statuses CRUD', () => {
     it('should return edit form for authenticated users', async () => {
       await createUser();
       const cookies = await signIn();
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'GET',
@@ -205,7 +205,7 @@ describe('Statuses CRUD', () => {
 
   describe('PATCH /statuses/:id', () => {
     it('should redirect unauthenticated users to login', async () => {
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'PATCH',
@@ -218,14 +218,14 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/session/new');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses[0].name).toBe('Новый');
     });
 
     it('should update status for authenticated users', async () => {
       await createUser();
       const cookies = await signIn();
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'PATCH',
@@ -239,14 +239,14 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/statuses');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses[0].name).toBe('Изменённый');
     });
 
     it('should not update status with empty name', async () => {
       await createUser();
       const cookies = await signIn();
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'PATCH',
@@ -259,14 +259,14 @@ describe('Statuses CRUD', () => {
 
       expect(response.statusCode).toBe(422);
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses[0].name).toBe('Новый');
     });
   });
 
   describe('DELETE /statuses/:id', () => {
     it('should redirect unauthenticated users to login', async () => {
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'DELETE',
@@ -276,14 +276,14 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/session/new');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(1);
     });
 
     it('should delete status for authenticated users', async () => {
       await createUser();
       const cookies = await signIn();
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
 
       const response = await server.inject({
         method: 'DELETE',
@@ -294,7 +294,7 @@ describe('Statuses CRUD', () => {
       expect(response.statusCode).toBe(302);
       expect(response.headers.location).toBe('/statuses');
 
-      const statuses = await knex('task_statuses').select();
+      const statuses = await knex('taskStatuses').select();
       expect(statuses).toHaveLength(0);
     });
   });

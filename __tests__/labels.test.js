@@ -1,16 +1,16 @@
 import app from '../server/index.js';
+import encrypt from '../server/lib/secure.js';
 
 describe('Labels CRUD', () => {
   let server;
   let knex;
 
   const createUser = async () => {
-    const { encrypt } = await import('../server/lib/secure.js');
     const [userId] = await knex('users').insert({
-      first_name: 'Test',
-      last_name: 'User',
+      firstName: 'Test',
+      lastName: 'User',
       email: 'test@example.com',
-      password_digest: encrypt('password'),
+      passwordDigest: encrypt('password'),
     });
     return userId;
   };
@@ -36,10 +36,10 @@ describe('Labels CRUD', () => {
   });
 
   beforeEach(async () => {
-    await knex('tasks_labels').truncate();
+    await knex('tasksLabels').truncate();
     await knex('tasks').truncate();
     await knex('labels').truncate();
-    await knex('task_statuses').truncate();
+    await knex('taskStatuses').truncate();
     await knex('users').truncate();
   });
 
@@ -305,14 +305,14 @@ describe('Labels CRUD', () => {
       const userId = await createUser();
       const cookies = await signIn();
 
-      const [statusId] = await knex('task_statuses').insert({ name: 'Новый' });
+      const [statusId] = await knex('taskStatuses').insert({ name: 'Новый' });
       const [labelId] = await knex('labels').insert({ name: 'Важное' });
       const [taskId] = await knex('tasks').insert({
         name: 'Тестовая задача',
-        status_id: statusId,
-        creator_id: userId,
+        statusId,
+        creatorId: userId,
       });
-      await knex('tasks_labels').insert({ task_id: taskId, label_id: labelId });
+      await knex('tasksLabels').insert({ taskId, labelId });
 
       const response = await server.inject({
         method: 'DELETE',
