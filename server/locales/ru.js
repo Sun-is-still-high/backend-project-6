@@ -1,6 +1,9 @@
 export default {
   translation: {
     appName: 'Менеджер задач',
+    errors: {
+      emailAlreadyInUse: 'Email уже используется',
+    },
     layouts: {
       navbar: {
         brand: 'Менеджер задач',

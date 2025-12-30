@@ -1,6 +1,9 @@
 export default {
   translation: {
     appName: 'Task Manager',
+    errors: {
+      emailAlreadyInUse: 'Email already in use',
+    },
     layouts: {
       navbar: {
         brand: 'Task Manager',

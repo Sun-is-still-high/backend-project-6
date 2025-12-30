@@ -1,7 +1,11 @@
 import { Model } from 'objection';
 import objectionUnique from 'objection-unique';
 
-const unique = objectionUnique({ fields: ['email'] });
+const unique = objectionUnique({
+  fields: ['email'],
+  identifiers: ['id'],
+  message: 'errors.emailAlreadyInUse',
+});
 
 class User extends unique(Model) {
   static get tableName() {

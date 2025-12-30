@@ -46,7 +46,8 @@ block content
                     class={'is-invalid': errors && errors.email}
                   )
                   if errors && errors.email
-                    .invalid-feedback.d-block= errors.email[0].message
+                    - var msg = errors.email[0].message
+                    .invalid-feedback.d-block= msg.startsWith('errors.') ? t(msg) : msg
 
                 .mb-3
                   label.form-label(for="data_password")= t('views.users.password')
