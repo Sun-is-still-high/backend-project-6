@@ -1,5 +1,5 @@
 doctype html
-html.h-100(lang="ru")
+html.h-100(lang=currentLang || "ru")
   head
     meta(charset="UTF-8")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
@@ -34,6 +34,23 @@ html.h-100(lang="ru")
                 a.nav-link(href="/session/new")= t('layouts.navbar.signIn')
               li.nav-item
                 a.nav-link(href="/users/new")= t('layouts.navbar.signUp')
+          ul.navbar-nav.ms-3.align-items-center
+            li.nav-item
+              if currentLang === 'ru'
+                span.nav-link.py-0.fw-bold RU
+              else
+                form.d-inline(method="post" action="/lang")
+                  input(type="hidden" name="lang" value="ru")
+                  button.btn.btn-link.nav-link.py-0.text-decoration-none(type="submit") RU
+            li.nav-item
+              span.text-muted |
+            li.nav-item
+              if currentLang === 'en'
+                span.nav-link.py-0.fw-bold EN
+              else
+                form.d-inline(method="post" action="/lang")
+                  input(type="hidden" name="lang" value="en")
+                  button.btn.btn-link.nav-link.py-0.text-decoration-none(type="submit") EN
 
     main.container.mt-4.flex-grow-1
       if flash.info

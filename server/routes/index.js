@@ -4,6 +4,7 @@ import session from './session.js';
 import statuses from './statuses.js';
 import tasks from './tasks.js';
 import labels from './labels.js';
+import lang from './lang.js';
 
 const controllers = [
   welcome,
@@ -12,6 +13,7 @@ const controllers = [
   statuses,
   tasks,
   labels,
+  lang,
 ];
 
 export default async (app) => {

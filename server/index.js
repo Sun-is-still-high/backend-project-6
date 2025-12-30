@@ -67,6 +67,9 @@ const registerPlugins = async (app) => {
   if (!app.hasRequestDecorator('currentUser')) {
     app.decorateRequest('currentUser', null);
   }
+  if (!app.hasRequestDecorator('lang')) {
+    app.decorateRequest('lang', 'ru');
+  }
   if (!app.hasRequestDecorator('flash')) {
     app.decorateRequest('flash', function (type, message) {
       const flash = this.session.get('flash') || {};
@@ -78,6 +81,9 @@ const registerPlugins = async (app) => {
     if (req.user) {
       req.currentUser = req.user;
     }
+    const lang = req.session?.get('lang') || 'ru';
+    await i18next.changeLanguage(lang);
+    req.lang = lang;
   });
 
   await app.register(view, {
@@ -95,6 +101,7 @@ const registerPlugins = async (app) => {
     return this.view(viewPath, {
       ...data,
       currentUser: this.request.currentUser,
+      currentLang: this.request.lang,
       flash,
     });
   });
