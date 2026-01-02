@@ -109,7 +109,7 @@ const registerPlugins = async (app) => {
 
 export const options = {};
 
-export default async (app, opts) => {
+export default async (app, opts = {}) => {
   await setupLocalization();
 
   const envName = opts.envName || process.env.NODE_ENV || 'development';
