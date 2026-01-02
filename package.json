@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Hexlet backend project 6",
-  "main": "server/index.js",
+  "main": "server/plugin.js",
   "scripts": {
     "build": "webpack",
     "start": "fastify start server/plugin.js",
