@@ -1,8 +1,8 @@
 // @ts-check
 
+import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import Fastify from 'fastify';
 import view from '@fastify/view';
 import fastifyStatic from '@fastify/static';
 import formbody from '@fastify/formbody';
@@ -107,31 +107,28 @@ const registerPlugins = async (app) => {
   });
 };
 
-const app = async (envName = process.env.NODE_ENV || 'development') => {
+export const options = {};
+
+export default async (app, opts) => {
   await setupLocalization();
 
+  const envName = opts.envName || process.env.NODE_ENV || 'development';
   const config = knexConfig[envName] || knexConfig.development;
 
-  const fastify = new Fastify({
-    logger: envName !== 'test',
-  });
+  setupDatabase(app, config);
+  await registerPlugins(app);
+  await addRoutes(app);
 
-  setupDatabase(fastify, config);
-  await registerPlugins(fastify);
-  await addRoutes(fastify);
-
-  fastify.setErrorHandler((error, request, reply) => {
+  app.setErrorHandler((error, request, reply) => {
     rollbar.error(error, request);
-    fastify.log.error(error);
+    app.log.error(error);
     reply.status(500).send({ error: 'Internal Server Error' });
   });
 
-  fastify.setNotFoundHandler((request, reply) => {
+  app.setNotFoundHandler((request, reply) => {
     rollbar.warning(`404 Not Found: ${request.method} ${request.url}`, request);
     reply.status(404).send({ error: 'Not Found' });
   });
 
-  return fastify;
+  return app;
 };
-
-export default app;

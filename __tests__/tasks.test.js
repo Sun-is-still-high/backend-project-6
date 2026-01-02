@@ -1,4 +1,5 @@
-import app from '../server/index.js';
+import fastify from 'fastify';
+import init from '../server/plugin.js';
 import encrypt from '../server/lib/secure.js';
 
 describe('Tasks CRUD', () => {
@@ -35,7 +36,8 @@ describe('Tasks CRUD', () => {
   };
 
   beforeAll(async () => {
-    server = await app('test');
+    server = fastify({ logger: false });
+    await init(server, { envName: 'test' });
     knex = server.knex;
     await knex.migrate.latest();
   });
